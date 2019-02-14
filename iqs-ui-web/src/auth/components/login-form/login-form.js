@@ -1,13 +1,16 @@
 import React from 'react';
 import http from '../../../services/http';
+import './login-form.scss';
+import IqInput from '../../common/components/infrastructure/iq-input/iq-input';
+import IqTitle from '../../common/components/infrastructure/iq-icon-title/iq-icon-title';
 
-export default () => { 
+export default (props) => { 
 
     function onLogin(e) {
         e.preventDefault();
 
-        const loginInputValue = document.getElementById('loginInput').value;
-        const passInputValue = document.getElementById('passInput').value;
+        const loginInputValue = document.getElementById('loginField').value;
+        const passInputValue = document.getElementById('passField').value;
 
         const authData = JSON.stringify({ 
             username: loginInputValue,
@@ -37,30 +40,23 @@ export default () => {
     //         }).then((value) => {
     //             console.log('We ve successfully got the value: ', value);
     //         });
-    // }
+    // }<i class="far fa-id-badge"></i>
 
-    return (<div className="auth-form">
-        <div className="auth-form__header">
-            <div className="title">
-                <div className="title__icon-container">
-                    <span>ico</span>
-                </div>
-                <div className="title__content">
-                    <span>Authorization form</span>
-                </div>
+    return (<div className="auth-container">
+        <div className="auth-form">
+            <div className="auth-form__item">
+                <IqTitle content="Login form" fa-icon-key="far fa-id-badge" color="rgb(98, 77, 206)"></IqTitle>
             </div>
-        </div>
-        <div className="auth-form__field">
-            <label htmlFor="loginInput">login</label>
-            <input id="loginInput"></input>
-        </div>
-        <div className="auth-form__field">
-            <label htmlFor="passInput">password</label>
-            <input id="passInput"></input>
-        </div>
-        <div className="auth-form__actions-panel">
-            <input className="auth-form__action" type="submit" id="loginActionBtn" onClick={onLogin} value="login" ></input>
-            <input className="auth-form__action" type="button" id="logoffActionBtn" onClick={onLogout} value="logoff" ></input>
+            <div className="auth-form__item">
+                <IqInput data-key="loginField" title="Username"></IqInput>
+            </div>
+            <div className="auth-form__item">
+                <IqInput data-key="passField" title="Password"></IqInput>
+            </div>
+            <div className="auth-form__actions-panel">
+                <input className="auth-form__action" type="submit" id="loginActionBtn" onClick={onLogin} value="SIGN IN" ></input>
+                <input className="auth-form__action" type="button" id="logoffActionBtn" onClick={onLogout} value="SIGN OUT" ></input>
+            </div>
         </div>
     </div>)
 };
