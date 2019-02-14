@@ -1,0 +1,34 @@
+.iq-input {
+    display: flex;
+    padding: 0.5em 0.2em 0.2em 0.2em;
+    color: #535254;
+
+    &__title {
+        position: absolute;
+        transition: 0.2s;
+        margin-left: 0.3em;
+    }
+
+    &__title.not-empty,
+    .active {
+        transform: translateY(-1.3em);
+        font-size: 12px;
+    }
+
+    &__title.active {
+        color: blue;
+    }
+
+    input {
+        border: solid 1px transparent;
+        border-radius: 2px;
+        padding: 0.3em;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: blue;
+        border-radius: 2px;
+    }
+
+}

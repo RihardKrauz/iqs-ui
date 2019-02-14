@@ -2,41 +2,44 @@ import axios from 'axios';
 
 const TOKEN_KEY = 'accessToken';
 const REFRESH_KEY = 'refreshToken';
+const CURRENT_USER = 'currentUser';
 
 function applySecurityHeadersToAxiosRequests() {
-    axios.defaults.headers.get['Authorization'] = 'Bearer ' + axios.getSecurityTokenData();
-    axios.defaults.headers.put['Authorization'] = 'Bearer ' + axios.getSecurityTokenData();
-    axios.defaults.headers.post['Authorization'] = 'Bearer ' + axios.getSecurityTokenData();
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + axios.getSecurityTokenData();
+    const headers = axios.defaults.headers;
+    for (let prop in headers) {
+        headers[prop]['Authorization'] = 'Bearer ' + axios.getSecurityTokenData();
+    }
 }
 
 function applyContentTypeHeadersToAxiosRequests() {
-    axios.defaults.headers.post['Content-Type'] = 'application/json';
-    axios.defaults.headers.put['Content-Type'] = 'application/json';
-    axios.defaults.headers.get['Content-Type'] = 'application/json';
-    axios.defaults.headers.common['Content-Type'] = 'application/json';
+    const headers = axios.defaults.headers;
+    for (let prop in headers) {
+        headers[prop]['Content-Type'] = 'application/json';
+    }
 }
 
 function clearSecurityHeadersFromAxiosRequests() {
-    delete axios.defaults.headers.get['Authorization'];
-    delete axios.defaults.headers.put['Authorization'];
-    delete axios.defaults.headers.post['Authorization'];
-    delete axios.defaults.headers.common['Authorization'];
+    const headers = axios.defaults.headers;
+    for (let prop in headers) {
+        delete headers[prop]['Authorization'];
+    }
 }
 
 axios.getSecurityTokenData = function() {
-    return sessionStorage.getItem(TOKEN_KEY) || '';
+    return localStorage.getItem(TOKEN_KEY) || '';
 }
 
 axios.setSecurityTokenData = function(responseData) {
-    sessionStorage.setItem(TOKEN_KEY, responseData.access_token);
-    sessionStorage.setItem(REFRESH_KEY, responseData.refresh_token);
+    localStorage.setItem(TOKEN_KEY, responseData.access_token);
+    localStorage.setItem(REFRESH_KEY, responseData.refresh_token);
+    localStorage.setItem(CURRENT_USER, responseData.username);
     applySecurityHeadersToAxiosRequests();
 }
 
 axios.clearSecurityTokenData = function() {
-    sessionStorage.removeItem(TOKEN_KEY);
-    sessionStorage.removeItem(REFRESH_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_KEY);
+    localStorage.removeItem(CURRENT_USER);
     clearSecurityHeadersFromAxiosRequests();
 }
 
@@ -60,8 +63,8 @@ axios.interceptors.response.use(
     error => {
         if (error.response.status === 401 && error.response.headers['token-expired']) {
             const securityData = JSON.stringify({ 
-                token: sessionStorage.getItem(TOKEN_KEY),
-                refreshToken: sessionStorage.getItem(REFRESH_KEY)
+                token: localStorage.getItem(TOKEN_KEY),
+                refreshToken: localStorage.getItem(REFRESH_KEY)
             });
     
             return axios.put('http://localhost:1056/token', securityData /*, { headers } */)
