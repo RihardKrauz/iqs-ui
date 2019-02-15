@@ -56,7 +56,7 @@ axios.interceptors.response.use(
         return Promise.resolve(response.data.value);
     },
     error => {
-        if (error.response.status === 401 && error.response.headers['token-expired']) {
+        if (error.response && error.response.status === 401 && error.response.headers['token-expired']) {
             const securityData = JSON.stringify({ 
                 access_token: localStorage.getItem(STORAGE_KEYS.TOKEN_KEY),
                 refresh_token: localStorage.getItem(STORAGE_KEYS.REFRESH_KEY),

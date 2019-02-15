@@ -28,8 +28,9 @@ export default (props) => {
             });
     }
 
-    function onSupportRequire(e) {
+    function onSignUp(e) {
         e.preventDefault();
+        props.history.push('/register');
     }
 
     return (<div className="auth-container">
@@ -41,11 +42,11 @@ export default (props) => {
                 <IqInput data-key="loginField" title="Username"></IqInput>
             </div>
             <div className="auth-form__item">
-                <IqInput hide-chars="true" data-key="passField" title="Password"></IqInput>
+                <IqInput data-type="password" data-key="passField" title="Password"></IqInput>
             </div>
             <div className="auth-form__actions-panel">
                 <input className="auth-form__action" type="submit" id="loginActionBtn" onClick={onLogin} value="SIGN IN" ></input>
-                <input className="auth-form__action" type="button" id="helpBtn" onClick={onSupportRequire} value="OPTIONS" ></input>
+                <input className="auth-form__action" type="button" id="signUpActionBtn" onClick={onSignUp} value="SIGN UP" ></input>
             </div>
         </div>
     </div>)

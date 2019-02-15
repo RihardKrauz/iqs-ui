@@ -25,7 +25,7 @@ export default (props) => {
         </div>
         <div className="iq-input__value">
             <input 
-                type={props['hide-chars'] === 'true' ? 'password' : 'text'}
+                type={props['data-type'] ? props['data-type'] : 'text'}
                 className="iq-input__value-el" 
                 id={props['data-key']} 
                 onFocus={onFocusInput} 
