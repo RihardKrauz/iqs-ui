@@ -24,7 +24,13 @@ export default (props) => {
                 htmlFor={props['data-key']}>{props.title}</label>
         </div>
         <div className="iq-input__value">
-            <input className="iq-input__value-el" id={props['data-key']} onFocus={onFocusInput} onBlur={onBlurInput} onChange={onChangeInput}></input>
+            <input 
+                type={props['hide-chars'] === 'true' ? 'password' : 'text'}
+                className="iq-input__value-el" 
+                id={props['data-key']} 
+                onFocus={onFocusInput} 
+                onBlur={onBlurInput} 
+                onChange={onChangeInput}></input>
         </div>
     </div>);
 };

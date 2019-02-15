@@ -7,6 +7,10 @@
         position: absolute;
         transition: 0.2s;
         margin-left: 0.3em;
+
+        &-el {
+            cursor: text;
+        }
     }
 
     &__title.not-empty,

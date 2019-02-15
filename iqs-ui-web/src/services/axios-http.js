@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { STORAGE_KEYS } from './storage';
 
-const TOKEN_KEY = 'accessToken';
-const REFRESH_KEY = 'refreshToken';
-const CURRENT_USER = 'currentUser';
+axios.getApiUri = function() {
+    return 'http://localhost:1056';
+}
 
 function applySecurityHeadersToAxiosRequests() {
     const headers = axios.defaults.headers;
@@ -26,20 +27,20 @@ function clearSecurityHeadersFromAxiosRequests() {
 }
 
 axios.getSecurityTokenData = function() {
-    return localStorage.getItem(TOKEN_KEY) || '';
+    return localStorage.getItem(STORAGE_KEYS.TOKEN_KEY) || '';
 }
 
 axios.setSecurityTokenData = function(responseData) {
-    localStorage.setItem(TOKEN_KEY, responseData.access_token);
-    localStorage.setItem(REFRESH_KEY, responseData.refresh_token);
-    localStorage.setItem(CURRENT_USER, responseData.username);
+    localStorage.setItem(STORAGE_KEYS.TOKEN_KEY, responseData.access_token);
+    localStorage.setItem(STORAGE_KEYS.REFRESH_KEY, responseData.refresh_token);
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, responseData.username);
     applySecurityHeadersToAxiosRequests();
 }
 
 axios.clearSecurityTokenData = function() {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_KEY);
-    localStorage.removeItem(CURRENT_USER);
+    localStorage.removeItem(STORAGE_KEYS.TOKEN_KEY);
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_KEY);
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
     clearSecurityHeadersFromAxiosRequests();
 }
 
@@ -51,23 +52,18 @@ axios.interceptors.response.use(
         if (response.data && response.data.isOk === false) {
             return Promise.reject(response.data.exceptionMessage || response.data.value);
         }
-        let parsedResponse;
-        try {
-            parsedResponse = JSON.parse(response.data.value);
-        } catch(ex) {
-            console.error('Parse error', response.data.value);
-            Promise.resolve(response.data)
-        }
-        return Promise.resolve(parsedResponse);
+
+        return Promise.resolve(response.data.value);
     },
     error => {
         if (error.response.status === 401 && error.response.headers['token-expired']) {
             const securityData = JSON.stringify({ 
-                token: localStorage.getItem(TOKEN_KEY),
-                refreshToken: localStorage.getItem(REFRESH_KEY)
+                access_token: localStorage.getItem(STORAGE_KEYS.TOKEN_KEY),
+                refresh_token: localStorage.getItem(STORAGE_KEYS.REFRESH_KEY),
+                username: localStorage.getItem(STORAGE_KEYS.CURRENT_USER)
             });
     
-            return axios.put('http://localhost:1056/token', securityData /*, { headers } */)
+            return axios.put(`${axios.getApiUri()}/token`, securityData)
             .then(response => {
                 console.log('Updating security token');
                 axios.setSecurityTokenData(response);
