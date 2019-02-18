@@ -1,6 +1,7 @@
 import React from 'react';
 import http from '../../../services/axios-http';
 import './login-form.scss';
+import { GetHashCode } from '../../../common/utils/security';
 import IqInput from '../../../common/components/infrastructure/iq-input/iq-input';
 import IqTitle from '../../../common/components/infrastructure/iq-icon-title/iq-icon-title';
 
@@ -14,7 +15,7 @@ export default (props) => {
 
         const authData = JSON.stringify({ 
             username: loginInputValue,
-            password: passInputValue
+            password: GetHashCode(passInputValue)
         });
 
         http.post(`${http.getApiUri()}/token`, authData)

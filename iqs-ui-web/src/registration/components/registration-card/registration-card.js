@@ -3,6 +3,7 @@ import IqTitle from '../../../common/components/infrastructure/iq-icon-title/iq-
 import IqInput from '../../../common/components/infrastructure/iq-input/iq-input';
 import './registration-card.scss';
 import http from '../../../services/axios-http';
+import { GetHashCode } from '../../../common/utils/security';
 
 export default (props) => {
     function onCreate(e) {
@@ -14,7 +15,7 @@ export default (props) => {
                 name: document.getElementById('nameField').value,
                 age: document.getElementById('ageField').value
             },
-            password: document.getElementById('pass1Field').value
+            password: GetHashCode(document.getElementById('pass1Field').value)
         });
 
         http.post(`${http.getApiUri()}/user`, userData)
@@ -30,7 +31,7 @@ export default (props) => {
     return (<div className="register-layout">
         <div className="user-form">
             <div className="user-form__item">
-                <IqTitle content="Create user" fa-icon-key="far fa-smile" color="rgb(98, 77, 206)"></IqTitle>
+                <IqTitle content="Create user" fa-icon-key="far fa-edit" color="rgb(98, 77, 206)"></IqTitle>
             </div>
             <div className="user-form__item">
                 <IqInput data-key="loginField" title="Login"></IqInput>
