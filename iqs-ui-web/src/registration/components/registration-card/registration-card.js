@@ -1,64 +1,37 @@
-import React, { useState } from 'react';
-import IqTitle from '../../../common/components/infrastructure/iq-icon-title/iq-icon-title';
-import IqInput from '../../../common/components/infrastructure/iq-input/iq-input';
+import React from 'react';
+import IqTitle from '../../../common/components/ui-kit/iq-icon-title/iq-icon-title';
+import IqInput from '../../../common/components/ui-kit/iq-input/iq-input';
 import './registration-card.scss';
 import http from '../../../services/axios-http';
 import { GetHashCode } from '../../../common/utils/security';
+import { ValidatedField } from '../../../common/components/ui-kit/forms/validated-field';
 
 export default props => {
-    const [loginErrors, setLoginErrors] = useState([]);
-    const [nameErrors, setNameErrors] = useState([]);
-    const [ageErrors, setAgeErrors] = useState([]);
-    const [pass1Errors, setPass1Errors] = useState([]);
-    const [pass2Errors, setPass2Errors] = useState([]);
-
-    const [loginValue, setLoginValue] = useState('');
-    const [nameValue, setNameValue] = useState('');
-    const [ageValue, setAgeValue] = useState(0);
-    const [pass1Value, setPass1Value] = useState('');
-    const [pass2Value, setPass2Value] = useState('');
-
-    const [validateLogin, setValidateLoginAction] = useState({});
-    const [validateName, setValidateNameAction] = useState({});
-    const [validateAge, setValidateAgeAction] = useState({});
-    const [validatePass1, setValidatePass1Action] = useState({});
-    const [validatePass2, setValidatePass2Action] = useState({});
-
-    const validationProps = {
-        login: [{ type: 'required' }],
-        name: [{ type: 'required' }, { type: 'length', value: 5 }],
-        age: [{ type: 'required' }, { type: 'range', valueFrom: 0, valueTo: 99 }],
-        pass1: [{ type: 'required' }, { type: 'equal', value: pass2Value }],
-        pass2: [{ type: 'required' }, { type: 'equal', value: pass1Value }]
+    const fields = {
+        Login: new ValidatedField('Login', '', [{ type: 'required' }]),
+        Name: new ValidatedField('Name', '', [{ type: 'required' }, { type: 'length', value: 5 }]),
+        Age: new ValidatedField('Age', 0, [{ type: 'required' }, { type: 'range', valueFrom: 0, valueTo: 99 }]),
+        Password1: new ValidatedField('Password1', '', [{ type: 'required' }]),
+        Password2: new ValidatedField('Password2', '', [{ type: 'required' }])
     };
 
+    fields['Password1'].addValidationParam('equal', fields['Password2'].value);
+    fields['Password2'].addValidationParam('equal', fields['Password1'].value);
+
     function validateFormAndGetAllErrors() {
-        return [
-            {
-                field: 'login',
-                errors: validateLogin.event(loginValue, validationProps.login)
-            },
-            {
-                field: 'name',
-                errors: validateName.event(nameValue, validationProps.name)
-            },
-            {
-                field: 'age',
-                errors: validateAge.event(ageValue, validationProps.age)
-            },
-            {
-                field: 'password1',
-                errors: validatePass1.event(pass1Value, validationProps.pass1)
-            },
-            {
-                field: 'password2',
-                errors: validatePass2.event(pass2Value, validationProps.pass2)
-            }
-        ];
+        const result = [];
+        for (let fieldName in fields) {
+            result.push({
+                name: fields[fieldName].name,
+                errors: fields[fieldName].validation.validate()
+            });
+        }
+        return result;
     }
 
     const getErrorsCount = e => e.map(err => err.errors).reduce((acc, val) => acc.concat(val), []).length;
-    const getErrorMsg = e => e.map(err => `Errors in field '${err.field}': ${err.errors.join(', ')}`);
+    const getErrorMsg = e =>
+        e.map(err => (err.errors.length > 0 ? `Errors in field '${err.name}': ${err.errors.join(', ')}` : ''));
 
     function onCreateBtnClick(e) {
         e.preventDefault();
@@ -73,11 +46,11 @@ export default props => {
     function saveUser() {
         const userData = JSON.stringify({
             user: {
-                login: loginValue,
-                name: nameValue,
-                age: ageValue
+                login: fields['Login'].value,
+                name: fields['Name'].value,
+                age: fields['Age'].value
             },
-            password: GetHashCode(pass1Value)
+            password: GetHashCode(fields['Password1'].value)
         });
 
         http.post(`${http.getApiUri()}/user`, userData)
@@ -103,30 +76,27 @@ export default props => {
                         <IqInput
                             data-key="loginField"
                             title="Login"
-                            on-change={setLoginValue}
-                            on-validate={setLoginErrors}
-                            validation={validationProps.login}
-                            bind-validate-action={setValidateLoginAction}
+                            on-change={fields['Login'].onChange}
+                            validation={fields['Login'].validation.params}
+                            bind-validate-action={fields['Login'].validation.bindAction}
                         />
                     </div>
                     <div className="user-form__item">
                         <IqInput
                             data-key="nameField"
                             title="Name"
-                            on-change={setNameValue}
-                            on-validate={setNameErrors}
-                            validation={validationProps.name}
-                            bind-validate-action={setValidateNameAction}
+                            on-change={fields['Name'].onChange}
+                            validation={fields['Name'].validation.params}
+                            bind-validate-action={fields['Name'].validation.bindAction}
                         />
                     </div>
                     <div className="user-form__item">
                         <IqInput
                             data-type="number"
                             data-key="ageField"
-                            on-change={setAgeValue}
-                            on-validate={setAgeErrors}
-                            validation={validationProps.age}
-                            bind-validate-action={setValidateAgeAction}
+                            on-change={fields['Age'].onChange}
+                            validation={fields['Age'].validation.params}
+                            bind-validate-action={fields['Age'].validation.bindAction}
                             title="Age"
                         />
                     </div>
@@ -136,12 +106,11 @@ export default props => {
                             data-key="pass1Field"
                             title="Enter password"
                             on-change={val => {
-                                setPass1Value(val);
-                                validatePass2.event(val, validationProps.pass1);
+                                fields['Password1'].onChange(val);
+                                fields['Password2'].validation.validate(val, fields['Password1'].validation.params);
                             }}
-                            on-validate={setPass1Errors}
-                            bind-validate-action={setValidatePass1Action}
-                            validation={validationProps.pass1}
+                            bind-validate-action={fields['Password1'].validation.bindAction}
+                            validation={fields['Password1'].validation.params}
                         />
                     </div>
                     <div className="user-form__item">
@@ -150,12 +119,11 @@ export default props => {
                             data-key="pass2Field"
                             title="Repeat password"
                             on-change={val => {
-                                setPass2Value(val);
-                                validatePass1.event(val, validationProps.pass2);
+                                fields['Password2'].onChange(val);
+                                fields['Password1'].validation.validate(val, fields['Password2'].validation.params);
                             }}
-                            on-validate={setPass2Errors}
-                            bind-validate-action={setValidatePass2Action}
-                            validation={validationProps.pass2}
+                            bind-validate-action={fields['Password2'].validation.bindAction}
+                            validation={fields['Password2'].validation.params}
                         />
                     </div>
                     <div className="user-form__actions-panel">
