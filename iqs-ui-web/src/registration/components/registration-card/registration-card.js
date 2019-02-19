@@ -1,12 +1,15 @@
-import React from 'react';
-import IqTitle from '../../../common/components/ui-kit/iq-icon-title/iq-icon-title';
-import IqInput from '../../../common/components/ui-kit/iq-input/iq-input';
+import React, { useState } from 'react';
+import IqTitle from '../../../common/ui-kit/iq-icon-title/iq-icon-title';
+import IqInput from '../../../common/ui-kit/iq-input/iq-input';
 import './registration-card.scss';
 import http from '../../../services/axios-http';
 import { GetHashCode } from '../../../common/utils/security';
-import { ValidatedField } from '../../../common/components/ui-kit/forms/validated-field';
+import { ValidatedField } from '../../../common/ui-kit/forms/validated-field';
+import Notifier from '../../../common/ui-kit/notification/notifier';
 
 export default props => {
+    const [notifierActions, setNotifierActions] = useState({});
+
     const fields = {
         Login: new ValidatedField('Login', '', [{ type: 'required' }]),
         Name: new ValidatedField('Name', '', [{ type: 'required' }, { type: 'length', value: 5 }]),
@@ -39,7 +42,7 @@ export default props => {
         if (getErrorsCount(errors) === 0) {
             saveUser();
         } else {
-            console.error(getErrorMsg(errors));
+            notifierActions.error(getErrorMsg(errors).join('\r\n'));
         }
     }
 
@@ -67,6 +70,7 @@ export default props => {
 
     return (
         <div>
+            <Notifier events={setNotifierActions} />
             <div className="register-layout">
                 <div className="user-form">
                     <div className="user-form__item">

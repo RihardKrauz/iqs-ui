@@ -2,8 +2,8 @@ import React from 'react';
 import http from '../../../services/axios-http';
 import './login-form.scss';
 import { GetHashCode } from '../../../common/utils/security';
-import IqInput from '../../../common/components/ui-kit/iq-input/iq-input';
-import IqTitle from '../../../common/components/ui-kit/iq-icon-title/iq-icon-title';
+import IqInput from '../../../common/ui-kit/iq-input/iq-input';
+import IqTitle from '../../../common/ui-kit/iq-icon-title/iq-icon-title';
 
 export default props => {
     function onLogin(e) {
