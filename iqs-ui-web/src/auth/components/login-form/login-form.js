@@ -4,6 +4,7 @@ import './login-form.scss';
 import { GetHashCode } from '../../../common/utils/security';
 import IqInput from '../../../common/ui-kit/iq-input/iq-input';
 import IqTitle from '../../../common/ui-kit/iq-icon-title/iq-icon-title';
+import { Toaster } from '../../../common/ui-kit/notification/notifier';
 
 export default props => {
     function onLogin(e) {
@@ -19,11 +20,11 @@ export default props => {
 
         http.post(`${http.getApiUri()}/token`, authData)
             .then(response => {
-                console.log('Successfully authenticated');
+                Toaster.notifySuccess('Successfully authenticated');
                 http.setSecurityTokenData(response);
             })
             .catch(e => {
-                console.log('Authorizarion error', e);
+                Toaster.notifyError(e);
             })
             .then(() => {
                 props.history.push('/profile');

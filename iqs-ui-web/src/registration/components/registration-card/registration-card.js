@@ -39,6 +39,11 @@ export default props => {
         }
     }
 
+    function onBackBtnClick(e) {
+        e.preventDefault();
+        props.history.push('/login');
+    }
+
     function saveUser() {
         const userData = JSON.stringify({
             user: {
@@ -129,6 +134,13 @@ export default props => {
                             id="signUpActionBtn"
                             onClick={onCreateBtnClick}
                             value="Create account"
+                        />
+                        <input
+                            className="user-form__action"
+                            type="button"
+                            id="backBtn"
+                            onClick={onBackBtnClick}
+                            value="Back"
                         />
                     </div>
                 </div>
