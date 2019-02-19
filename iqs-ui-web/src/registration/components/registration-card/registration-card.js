@@ -53,11 +53,11 @@ export default props => {
             .then(() => {
                 Toaster.notifySuccess('Successfully created');
             })
-            .catch(e => {
-                Toaster.notifyError('Authorizarion error');
-            })
             .then(() => {
                 props.history.push('/login');
+            })
+            .catch(e => {
+                Toaster.notifyError(e);
             });
     }
 
