@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
-import LoginForm from './auth/components/login-form/login-form';
-import ProfileCard from './profile/components/profile-card/profile-card';
-import RegisterCard from './registration/components/registration-card/registration-card';
+import LoginForm from './modules/auth/components/login-form/login-form';
+import ProfileCard from './modules/profile/components/profile-card/profile-card';
+import RegisterCard from './modules/registration/components/registration-card/registration-card';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import ProtectedRoute from './common/routing/protected-route';
 import { ToastContainer } from 'react-toastify';

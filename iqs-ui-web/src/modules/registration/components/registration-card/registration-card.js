@@ -1,11 +1,11 @@
 import React from 'react';
-import IqTitle from '../../../common/ui-kit/iq-icon-title/iq-icon-title';
-import IqInput from '../../../common/ui-kit/iq-input/iq-input';
+import IqTitle from '../../../../common/ui-kit/iq-icon-title/iq-icon-title';
+import IqInput from '../../../../common/ui-kit/iq-input/iq-input';
 import './registration-card.scss';
-import http from '../../../services/axios-http';
-import { GetHashCode } from '../../../common/utils/security';
-import { ValidatedField } from '../../../common/ui-kit/forms/validated-field';
-import { Toaster } from '../../../common/ui-kit/notification/notifier';
+import http from '../../../../services/axios-http';
+import { GetHashCode } from '../../../../common/utils/security';
+import { ValidatedField } from '../../../../common/ui-kit/forms/validated-field';
+import { Toaster } from '../../../../common/ui-kit/notification/notifier';
 
 export default props => {
     const fields = {

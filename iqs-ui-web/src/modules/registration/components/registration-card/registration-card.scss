@@ -1,6 +1,6 @@
-@import '../../../common/styles/colors.scss';
+@import '../../../../common/styles/colors.scss';
 
-.auth-form {
+.user-form {
     display: block;
     margin-top: 4em;
     padding: 0.5em;
@@ -39,7 +39,7 @@
     }
 }
 
-.auth-container {
+.register-layout {
     display: flex;
     justify-content: center;
 }
