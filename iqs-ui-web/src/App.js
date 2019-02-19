@@ -5,6 +5,8 @@ import ProfileCard from './profile/components/profile-card/profile-card';
 import RegisterCard from './registration/components/registration-card/registration-card';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import ProtectedRoute from './common/routing/protected-route';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 class App extends Component {
     render() {
@@ -18,6 +20,7 @@ class App extends Component {
                         <ProtectedRoute path="/profile" component={ProfileCard} />
                     </Switch>
                 </BrowserRouter>
+                <ToastContainer />
             </div>
         );
     }
