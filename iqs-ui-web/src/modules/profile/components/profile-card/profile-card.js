@@ -18,7 +18,8 @@ export default () => {
 
     return (
         <div>
-            This is your profile! {personData.name} {personData.age} {personData.role}
+            This is your profile:
+            {JSON.stringify(personData)}
         </div>
     );
 };

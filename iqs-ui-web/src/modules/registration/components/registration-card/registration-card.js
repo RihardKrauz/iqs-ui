@@ -2,6 +2,7 @@ import React from 'react';
 import IqTitle from '../../../../common/ui-kit/iq-icon-title/iq-icon-title';
 import IqInput from '../../../../common/ui-kit/iq-input/iq-input';
 import './registration-card.scss';
+import '../../../../common/styles/iq-form.scss';
 import http from '../../../../services/axios-http';
 import { GetHashCode } from '../../../../common/utils/security';
 import { ValidatedField } from '../../../../common/ui-kit/forms/validated-field';
@@ -69,11 +70,11 @@ export default props => {
     return (
         <div>
             <div className="register-layout">
-                <div className="user-form">
-                    <div className="user-form__item">
+                <div className="iq-form">
+                    <div className="iq-form__item">
                         <IqTitle content="Create user" fa-icon-key="far fa-edit" color="rgb(98, 77, 206)" />
                     </div>
-                    <div className="user-form__item">
+                    <div className="iq-form__item">
                         <IqInput
                             data-key="loginField"
                             title="Login"
@@ -82,7 +83,7 @@ export default props => {
                             bind-validate-action={fields['Login'].validation.bindAction}
                         />
                     </div>
-                    <div className="user-form__item">
+                    <div className="iq-form__item">
                         <IqInput
                             data-key="nameField"
                             title="Name"
@@ -91,7 +92,7 @@ export default props => {
                             bind-validate-action={fields['Name'].validation.bindAction}
                         />
                     </div>
-                    <div className="user-form__item">
+                    <div className="iq-form__item">
                         <IqInput
                             data-type="number"
                             data-key="ageField"
@@ -101,7 +102,7 @@ export default props => {
                             title="Age"
                         />
                     </div>
-                    <div className="user-form__item">
+                    <div className="iq-form__item">
                         <IqInput
                             data-type="password"
                             data-key="pass1Field"
@@ -114,7 +115,7 @@ export default props => {
                             validation={fields['Password1'].validation.params}
                         />
                     </div>
-                    <div className="user-form__item">
+                    <div className="iq-form__item">
                         <IqInput
                             data-type="password"
                             data-key="pass2Field"
@@ -127,16 +128,16 @@ export default props => {
                             validation={fields['Password2'].validation.params}
                         />
                     </div>
-                    <div className="user-form__actions-panel">
+                    <div className="iq-form__actions-panel">
                         <input
-                            className="user-form__action"
+                            className="iq-form__action"
                             type="submit"
                             id="signUpActionBtn"
                             onClick={onCreateBtnClick}
                             value="Create account"
                         />
                         <input
-                            className="user-form__action"
+                            className="iq-form__action"
                             type="button"
                             id="backBtn"
                             onClick={onBackBtnClick}

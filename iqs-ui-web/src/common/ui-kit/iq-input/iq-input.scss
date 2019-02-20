@@ -1,13 +1,16 @@
+@import '../../styles/colors.scss';
+
 .iq-input {
     display: flex;
     padding: 0.5em 0.2em 0.2em 0.2em;
-    color: #535254;
+    color: $cl-color-default;
     flex-direction: column;
 
     &__title {
         position: absolute;
         transition: 0.2s;
         margin-left: 0.3em;
+        color: $cl-color-strong;
 
         &-el {
             cursor: text;
@@ -21,16 +24,16 @@
     }
 
     &__title.active {
-        color: blue;
+        color: $cl-color-active;
     }
 
     &__value-el.invalid {
-        border-color: red;
+        border-color: $cl-color-invalid;
     }
 
     &__validation {
         font-size: 0.7em;
-        color: red;
+        color: $cl-color-invalid;
         max-width: 14em;
     }
 
@@ -49,11 +52,14 @@
         border: solid 1px transparent;
         border-radius: 2px;
         padding: 0.3em;
+        width: 100%;
+        padding-right: 0;
+        padding-left: 0;
     }
 
     input:focus {
         outline: none;
-        border-color: blue;
+        border-color: $cl-color-active;
         border-radius: 2px;
     }
 
