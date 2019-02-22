@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import IqTitle from '../../../../common/ui-kit/iq-icon-title/iq-icon-title';
 import IqInput from '../../../../common/ui-kit/iq-input/iq-input';
+import IqLoader from '../../../../common/ui-kit/iq-loader/iq-loader';
 import './registration-card.scss';
 import '../../../../common/styles/iq-form.scss';
 import http from '../../../../services/axios-http';
@@ -9,6 +10,8 @@ import { ValidatedField } from '../../../../common/ui-kit/forms/validated-field'
 import { Toaster } from '../../../../common/ui-kit/notification/notifier';
 
 export default props => {
+    const [isLoading, setLoading] = useState(false);
+
     const fields = {
         Login: new ValidatedField('Login', '', [{ type: 'required' }]),
         Name: new ValidatedField('Name', '', [{ type: 'required' }, { type: 'length', value: 5 }]),
@@ -55,95 +58,98 @@ export default props => {
             password: GetHashCode(fields['Password1'].value)
         });
 
+        setLoading(true);
+
         http.post(`${http.getApiUri()}/user`, userData)
             .then(() => {
                 Toaster.notifySuccess('Successfully created');
             })
             .then(() => {
+                setLoading(false);
                 props.history.push('/login');
             })
             .catch(e => {
+                setLoading(false);
                 Toaster.notifyError(e);
             });
     }
 
     return (
-        <div>
-            <div className="register-layout">
-                <div className="iq-form">
-                    <div className="iq-form__item">
-                        <IqTitle content="Create user" fa-icon-key="far fa-edit" color="rgb(98, 77, 206)" />
-                    </div>
-                    <div className="iq-form__item">
-                        <IqInput
-                            data-key="loginField"
-                            title="Login"
-                            on-change={fields['Login'].onChange}
-                            validation={fields['Login'].validation.params}
-                            bind-validate-action={fields['Login'].validation.bindAction}
-                        />
-                    </div>
-                    <div className="iq-form__item">
-                        <IqInput
-                            data-key="nameField"
-                            title="Name"
-                            on-change={fields['Name'].onChange}
-                            validation={fields['Name'].validation.params}
-                            bind-validate-action={fields['Name'].validation.bindAction}
-                        />
-                    </div>
-                    <div className="iq-form__item">
-                        <IqInput
-                            data-type="number"
-                            data-key="ageField"
-                            on-change={fields['Age'].onChange}
-                            validation={fields['Age'].validation.params}
-                            bind-validate-action={fields['Age'].validation.bindAction}
-                            title="Age"
-                        />
-                    </div>
-                    <div className="iq-form__item">
-                        <IqInput
-                            data-type="password"
-                            data-key="pass1Field"
-                            title="Enter password"
-                            on-change={val => {
-                                fields['Password1'].onChange(val);
-                                fields['Password2'].validation.validate(val, fields['Password1'].validation.params);
-                            }}
-                            bind-validate-action={fields['Password1'].validation.bindAction}
-                            validation={fields['Password1'].validation.params}
-                        />
-                    </div>
-                    <div className="iq-form__item">
-                        <IqInput
-                            data-type="password"
-                            data-key="pass2Field"
-                            title="Repeat password"
-                            on-change={val => {
-                                fields['Password2'].onChange(val);
-                                fields['Password1'].validation.validate(val, fields['Password2'].validation.params);
-                            }}
-                            bind-validate-action={fields['Password2'].validation.bindAction}
-                            validation={fields['Password2'].validation.params}
-                        />
-                    </div>
-                    <div className="iq-form__actions-panel">
-                        <input
-                            className="iq-form__action"
-                            type="submit"
-                            id="signUpActionBtn"
-                            onClick={onCreateBtnClick}
-                            value="Create account"
-                        />
-                        <input
-                            className="iq-form__action"
-                            type="button"
-                            id="backBtn"
-                            onClick={onBackBtnClick}
-                            value="Back"
-                        />
-                    </div>
+        <div className="register-layout">
+            {isLoading === true ? <IqLoader /> : ''}
+            <div className={`iq-form ${isLoading === true ? 'busy' : ''}`}>
+                <div className="iq-form__item">
+                    <IqTitle content="Create user" fa-icon-key="far fa-edit" color="rgb(98, 77, 206)" />
+                </div>
+                <div className="iq-form__item">
+                    <IqInput
+                        data-key="loginField"
+                        title="Login"
+                        on-change={fields['Login'].onChange}
+                        validation={fields['Login'].validation.params}
+                        bind-validate-action={fields['Login'].validation.bindAction}
+                    />
+                </div>
+                <div className="iq-form__item">
+                    <IqInput
+                        data-key="nameField"
+                        title="Name"
+                        on-change={fields['Name'].onChange}
+                        validation={fields['Name'].validation.params}
+                        bind-validate-action={fields['Name'].validation.bindAction}
+                    />
+                </div>
+                <div className="iq-form__item">
+                    <IqInput
+                        data-type="number"
+                        data-key="ageField"
+                        on-change={fields['Age'].onChange}
+                        validation={fields['Age'].validation.params}
+                        bind-validate-action={fields['Age'].validation.bindAction}
+                        title="Age"
+                    />
+                </div>
+                <div className="iq-form__item">
+                    <IqInput
+                        data-type="password"
+                        data-key="pass1Field"
+                        title="Enter password"
+                        on-change={val => {
+                            fields['Password1'].onChange(val);
+                            fields['Password2'].validation.validate(val, fields['Password1'].validation.params);
+                        }}
+                        bind-validate-action={fields['Password1'].validation.bindAction}
+                        validation={fields['Password1'].validation.params}
+                    />
+                </div>
+                <div className="iq-form__item">
+                    <IqInput
+                        data-type="password"
+                        data-key="pass2Field"
+                        title="Repeat password"
+                        on-change={val => {
+                            fields['Password2'].onChange(val);
+                            fields['Password1'].validation.validate(val, fields['Password2'].validation.params);
+                        }}
+                        bind-validate-action={fields['Password2'].validation.bindAction}
+                        validation={fields['Password2'].validation.params}
+                    />
+                </div>
+                <div className="iq-form__actions-panel">
+                    <input
+                        className="iq-form__action"
+                        type="submit"
+                        id="signUpActionBtn"
+                        onClick={onCreateBtnClick}
+                        value="Create account"
+                    />
+                    <input
+                        className="iq-form__action"
+                        type="button"
+                        id="backBtn"
+                        onClick={onBackBtnClick}
+                        value="Back"
+                    />
                 </div>
             </div>
         </div>

@@ -58,7 +58,8 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "test:mocha": "mocha src/tests/ui-kit/iq-input.spec.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -120,6 +121,11 @@
     ]
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "^1.9.1",
+    "enzyme-to-json": "^3.3.5",
+    "mocha": "^6.0.0",
     "node-sass": "^4.11.0",
     "sass-loader": "^7.1.0"
   }

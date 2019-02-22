@@ -1,16 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './iq-input.scss';
 
 const ErrorItem = props => <li className="iq-input__error-item">{props.value}</li>;
 
-export default props => {
-    const [focused, setFocused] = useState(false);
-    const [value, setValue] = useState('');
-    const [errors, setErrors] = useState([]);
+export default class IqInput extends React.Component {
+    constructor(props) {
+        super(props);
 
-    const checkValidity = (val, customValidationProps) => {
+        this.state = {
+            focused: false,
+            value: '',
+            errors: []
+        };
+
+        this.setFocused = this.setFocused.bind(this);
+        this.setValue = this.setValue.bind(this);
+        this.setErrors = this.setErrors.bind(this);
+        this.checkValidity = this.checkValidity.bind(this);
+        this.onChangeInput = this.onChangeInput.bind(this);
+        this.onFocusInput = this.onFocusInput.bind(this);
+        this.onBlurInput = this.onBlurInput.bind(this);
+    }
+
+    setFocused(val) {
+        this.setState({
+            focused: val
+        });
+    }
+
+    setValue(val) {
+        this.setState({
+            value: val
+        });
+    }
+
+    setErrors(val) {
+        this.setState({
+            errors: val
+        });
+    }
+
+    checkValidity(val, customValidationProps) {
         val = val || '';
-        customValidationProps = customValidationProps || props['validation'];
+        customValidationProps = customValidationProps || this.props['validation'];
 
         if (customValidationProps) {
             const errorList = customValidationProps
@@ -45,70 +77,76 @@ export default props => {
                 })
                 .filter(err => err !== '');
 
-            setErrors(errorList);
+            this.setErrors(errorList);
 
-            if (props['on-validate']) {
-                props['on-validate'](errorList);
+            if (this.props['on-validate']) {
+                this.props['on-validate'](errorList);
             }
 
             return errorList;
         }
 
         return [];
-    };
+    }
 
-    useEffect(() => {
-        if (props['bind-validate-action']) {
+    componentDidMount() {
+        if (this.props['bind-validate-action']) {
             let handler = {};
             handler.event = (data, value) => {
-                return checkValidity(data, value);
+                return this.checkValidity(data, value);
             };
-            props['bind-validate-action'](handler);
+            this.props['bind-validate-action'](handler);
         }
-    }, []);
+    }
 
-    const onFocusInput = () => {
-        setFocused(true);
-    };
-
-    const onBlurInput = () => {
-        setFocused(false);
-    };
-
-    const onChangeInput = e => {
-        setValue(e.currentTarget.value);
-        checkValidity(e.currentTarget.value);
-        if (props['on-change']) {
-            props['on-change'](e.currentTarget.value);
+    onChangeInput(e) {
+        this.setValue(e.currentTarget.value);
+        this.checkValidity(e.currentTarget.value);
+        if (this.props['on-change']) {
+            this.props['on-change'](e.currentTarget.value);
         }
-    };
+    }
 
-    return (
-        <div className="iq-input">
-            <div className={`iq-input__title ${focused === true ? 'active' : ''} ${value !== '' ? 'not-empty' : ''}`}>
-                <label className="iq-input__title-el" htmlFor={props['data-key']}>
-                    {props.title}
-                </label>
+    onFocusInput() {
+        this.setFocused(true);
+    }
+
+    onBlurInput() {
+        this.setFocused(false);
+    }
+
+    render() {
+        return (
+            <div className="iq-input">
+                <div
+                    className={`iq-input__title ${this.state.focused === true ? 'active' : ''} ${
+                        this.state.value !== '' ? 'not-empty' : ''
+                    }`}
+                >
+                    <label className="iq-input__title-el" htmlFor={this.props['data-key']}>
+                        {this.props.title}
+                    </label>
+                </div>
+                <div className="iq-input__value">
+                    <input
+                        type={this.props['data-type'] ? this.props['data-type'] : 'text'}
+                        className={`iq-input__value-el ${this.state.errors.length > 0 ? 'invalid' : ''}`}
+                        id={this.props['data-key']}
+                        onFocus={this.onFocusInput}
+                        onBlur={this.onBlurInput}
+                        onChange={this.onChangeInput}
+                    />
+                </div>
+                <div className={'iq-input__validation'}>
+                    {this.state.errors.length > 0 && (
+                        <ul className="iq-input__error-list">
+                            {this.state.errors.map((e, idx) => (
+                                <ErrorItem key={this.props['data-key'] + idx} value={e} />
+                            ))}
+                        </ul>
+                    )}
+                </div>
             </div>
-            <div className="iq-input__value">
-                <input
-                    type={props['data-type'] ? props['data-type'] : 'text'}
-                    className={`iq-input__value-el ${errors.length > 0 ? 'invalid' : ''}`}
-                    id={props['data-key']}
-                    onFocus={onFocusInput}
-                    onBlur={onBlurInput}
-                    onChange={onChangeInput}
-                />
-            </div>
-            <div className={'iq-input__validation'}>
-                {errors.length > 0 && (
-                    <ul className="iq-input__error-list">
-                        {errors.map((e, idx) => (
-                            <ErrorItem key={props['data-key'] + idx} value={e} />
-                        ))}
-                    </ul>
-                )}
-            </div>
-        </div>
-    );
-};
+        );
+    }
+}

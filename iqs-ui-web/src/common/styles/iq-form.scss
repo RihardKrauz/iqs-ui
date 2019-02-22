@@ -10,6 +10,11 @@
     color: $dark-purple;
     min-width: 18em;
 
+    &.busy {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
     &__item {
         margin: 0 0.5em 1.5em 0.5em;
     }

@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import http from '../../../../services/axios-http';
 import './login-form.scss';
 import '../../../../common/styles/iq-form.scss';
 import { GetHashCode } from '../../../../common/utils/security';
 import IqInput from '../../../../common/ui-kit/iq-input/iq-input';
 import IqTitle from '../../../../common/ui-kit/iq-icon-title/iq-icon-title';
+import IqLoader from '../../../../common/ui-kit/iq-loader/iq-loader';
 import { Toaster } from '../../../../common/ui-kit/notification/notifier';
 
 export default props => {
+    const [isLoading, setLoading] = useState(false);
+
     function onLogin(e) {
         e.preventDefault();
 
@@ -19,15 +22,18 @@ export default props => {
             password: GetHashCode(passInputValue)
         });
 
+        setLoading(true);
         http.post(`${http.getApiUri()}/token`, authData)
             .then(response => {
                 Toaster.notifySuccess('Successfully authenticated');
                 http.setSecurityTokenData(response);
             })
             .catch(e => {
+                setLoading(false);
                 Toaster.notifyError(e);
             })
             .then(() => {
+                setLoading(false);
                 props.history.push('/profile');
             });
     }
@@ -39,7 +45,8 @@ export default props => {
 
     return (
         <div className="auth-container">
-            <div className="iq-form">
+            {isLoading === true ? <IqLoader /> : ''}
+            <div className={`iq-form ${isLoading === true ? 'busy' : ''}`}>
                 <div className="iq-form__item">
                     <IqTitle content="Login form" fa-icon-key="fas fa-dove" color="rgb(98, 77, 206)" />
                 </div>
