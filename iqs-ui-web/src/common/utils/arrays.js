@@ -1,5 +1,6 @@
-export const groupArrayDataByKeyData = (key, value) =>
-    this.map(d => d.values.concat([]))
+export const groupArrayDataByKeys = (array, key, value) =>
+    array
+        .map(d => d.values.concat([]))
         .reduce((a, b) => a.concat(b, []))
         .reduce(
             (a, b, i, arr) =>
@@ -7,7 +8,7 @@ export const groupArrayDataByKeyData = (key, value) =>
                     ? a.concat(
                           arr
                               .filter(v => v[key] === b[key])
-                              .reduce((a1, b1) => ({ name: a1[key], data: [].concat(a1[value], b1[value]) }))
+                              .reduce((a1, b1) => ({ key: a1[key], values: [].concat(a1[value], b1[value]) }))
                       )
                     : a,
             []
