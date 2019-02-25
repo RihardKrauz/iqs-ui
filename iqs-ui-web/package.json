@@ -59,7 +59,8 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "test:mocha": "mocha src/tests/ui-kit/iq-input.spec.js"
+    "test:mocha": "mocha src/tests/ui-kit/iq-input.spec.js",
+    "test:karma": "karma start karma.conf.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -125,8 +126,15 @@
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.9.1",
     "enzyme-to-json": "^3.3.5",
+    "jasmine": "^3.3.1",
+    "karma": "^4.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-requirejs": "^1.1.0",
     "mocha": "^6.0.0",
     "node-sass": "^4.11.0",
+    "requirejs": "^2.3.6",
     "sass-loader": "^7.1.0"
   }
 }

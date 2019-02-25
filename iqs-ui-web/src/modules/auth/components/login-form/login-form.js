@@ -28,14 +28,15 @@ export default props => {
                 Toaster.notifySuccess('Successfully authenticated');
                 http.setSecurityTokenData(response);
             })
-            .catch(e => {
-                setLoading(false);
-                Toaster.notifyError(e);
-            })
             .then(() => {
                 setLoading(false);
                 props.history.push('/profile');
+            })
+            .catch(e => {
+                setLoading(false);
+                Toaster.notifyError(e);
             });
+            
     }
 
     function onSignUp(e) {
