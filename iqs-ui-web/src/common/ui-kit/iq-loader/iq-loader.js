@@ -1,4 +1,6 @@
 import React from 'react';
 import './iq-loader.scss';
 
-export default () => <div class="loader">Loading...</div>;
+export default function IqLoader() {
+    return <div className="loader">Loading...</div>;
+}

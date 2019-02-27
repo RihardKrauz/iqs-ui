@@ -1,5 +1,5 @@
 import React from 'react';
-import { configure, shallow, mount } from 'enzyme';
+import { configure, shallow } from 'enzyme';
 import IqInput from '../../common/ui-kit/iq-input/iq-input';
 import Adapter from 'enzyme-adapter-react-16';
 import { shallowToJson } from 'enzyme-to-json';
@@ -53,7 +53,7 @@ describe('<IqInput />', () => {
 
         input.simulate('change', { currentTarget: { value: '12345' } });
 
-        const errors = component.state().errors;
+        const { errors } = component.state();
 
         expect(errors).toEqual([]);
     });
@@ -67,7 +67,7 @@ describe('<IqInput />', () => {
 
         input.simulate('change', { currentTarget: { value: 'lessThan18Symbols' } });
 
-        const errors = component.state().errors;
+        const { errors } = component.state();
 
         expect(errors).toContain("This value's length should be more than 18 chars");
     });
@@ -81,7 +81,7 @@ describe('<IqInput />', () => {
 
         input.simulate('change', { currentTarget: { value: '' } });
 
-        const errors = component.state().errors;
+        const { errors } = component.state();
 
         expect(errors).toContain('This value is required');
     });
@@ -95,7 +95,7 @@ describe('<IqInput />', () => {
 
         input.simulate('change', { currentTarget: { value: '321' } });
 
-        const errors = component.state().errors;
+        const { errors } = component.state();
 
         expect(errors).toContain('Values should be equal');
     });
@@ -114,7 +114,7 @@ describe('<IqInput />', () => {
 
         input.simulate('change', { currentTarget: { value: 1 } });
 
-        const errors = component.state().errors;
+        const { errors } = component.state();
 
         expect(errors).toContain('Values should be in range from 2 to 5');
     });
@@ -133,7 +133,7 @@ describe('<IqInput />', () => {
 
         input.simulate('change', { currentTarget: { value: 7 } });
 
-        const errors = component.state().errors;
+        const { errors } = component.state();
 
         expect(errors).toContain('Values should be in range from 2 to 5');
     });

@@ -1,7 +1,14 @@
 import React from 'react';
+import { PropTypes } from 'prop-types';
 import './iq-input.scss';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 const ErrorItem = props => <li className="iq-input__error-item">{props.value}</li>;
+
+ErrorItem.propTypes = {
+    value: PropTypes.string
+};
 
 export default class IqInput extends React.Component {
     constructor(props) {
@@ -10,16 +17,23 @@ export default class IqInput extends React.Component {
         this.state = {
             focused: false,
             value: '',
-            errors: []
+            errors: [],
+            customErrors: []
         };
 
         this.setFocused = this.setFocused.bind(this);
         this.setValue = this.setValue.bind(this);
         this.setErrors = this.setErrors.bind(this);
+        this.setCustomErrors = this.setCustomErrors.bind(this);
         this.checkValidity = this.checkValidity.bind(this);
         this.onChangeInput = this.onChangeInput.bind(this);
         this.onFocusInput = this.onFocusInput.bind(this);
         this.onBlurInput = this.onBlurInput.bind(this);
+        this.addCustomError = this.addCustomError.bind(this);
+        this.removeCustomError = this.removeCustomError.bind(this);
+
+        this.input$ = new Subject();
+        this.inputChangeSubscription = null;
     }
 
     setFocused(val) {
@@ -37,6 +51,12 @@ export default class IqInput extends React.Component {
     setErrors(val) {
         this.setState({
             errors: val
+        });
+    }
+
+    setCustomErrors(val) {
+        this.setState({
+            customErrors: val
         });
     }
 
@@ -83,28 +103,47 @@ export default class IqInput extends React.Component {
                 this.props['on-validate'](errorList);
             }
 
-            return errorList;
+            return { errors: errorList, customErrors: this.state.customErrors };
         }
 
-        return [];
+        return {};
+    }
+
+    addCustomError(error) {
+        this.setCustomErrors([...this.state.customErrors, error]);
+    }
+
+    removeCustomError(error) {
+        this.setCustomErrors(this.state.customErrors.filter(e => e !== error));
     }
 
     componentDidMount() {
-        if (this.props['bind-validate-action']) {
-            let handler = {};
-            handler.event = (data, value) => {
-                return this.checkValidity(data, value);
-            };
-            this.props['bind-validate-action'](handler);
+        if (this.props['bind-events']) {
+            const { checkValidity, addCustomError, removeCustomError } = this;
+            this.props['bind-events']({ checkValidity, addCustomError, removeCustomError });
         }
+
+        this.inputChangeSubscription = this.input$
+            .pipe(
+                debounceTime(this.props['debounce-time']),
+                distinctUntilChanged()
+            )
+            .subscribe(val => {
+                if (this.props['on-change']) {
+                    this.props['on-change'](val);
+                }
+            });
+    }
+
+    componentWillUnmount() {
+        this.inputChangeSubscription.unsubscribe();
     }
 
     onChangeInput(e) {
-        this.setValue(e.currentTarget.value);
-        this.checkValidity(e.currentTarget.value);
-        if (this.props['on-change']) {
-            this.props['on-change'](e.currentTarget.value);
-        }
+        const { value } = e.currentTarget;
+        this.setValue(value);
+        this.checkValidity(value);
+        this.input$.next(value);
     }
 
     onFocusInput() {
@@ -130,7 +169,9 @@ export default class IqInput extends React.Component {
                 <div className="iq-input__value">
                     <input
                         type={this.props['data-type'] ? this.props['data-type'] : 'text'}
-                        className={`iq-input__value-el ${this.state.errors.length > 0 ? 'invalid' : ''}`}
+                        className={`iq-input__value-el ${
+                            this.state.errors.length + this.state.customErrors.length > 0 ? 'invalid' : ''
+                        }`}
                         id={this.props['data-key']}
                         onFocus={this.onFocusInput}
                         onBlur={this.onBlurInput}
@@ -138,9 +179,9 @@ export default class IqInput extends React.Component {
                     />
                 </div>
                 <div className={'iq-input__validation'}>
-                    {this.state.errors.length > 0 && (
+                    {this.state.errors.length + this.state.customErrors.length > 0 && (
                         <ul className="iq-input__error-list">
-                            {this.state.errors.map((e, idx) => (
+                            {this.state.errors.concat(this.state.customErrors).map((e, idx) => (
                                 <ErrorItem key={this.props['data-key'] + idx} value={e} />
                             ))}
                         </ul>
@@ -150,3 +191,14 @@ export default class IqInput extends React.Component {
         );
     }
 }
+
+IqInput.propTypes = {
+    title: PropTypes.string,
+    validation: PropTypes.array,
+    'on-validate': PropTypes.func,
+    'bind-events': PropTypes.func,
+    'on-change': PropTypes.func,
+    'data-key': PropTypes.string,
+    'data-type': PropTypes.string,
+    'debounce-time': PropTypes.string
+};

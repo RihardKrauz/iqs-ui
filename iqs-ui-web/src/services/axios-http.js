@@ -6,21 +6,17 @@ axios.getApiUri = function() {
 };
 
 function applySecurityHeadersToAxiosRequests() {
-    const headers = axios.defaults.headers;
-    for (let prop in headers) {
-        headers[prop]['Authorization'] = 'Bearer ' + axios.getSecurityTokenData();
-    }
+    const { headers } = axios.defaults;
+    Object.keys(headers).forEach(prop => (headers[prop]['Authorization'] = 'Bearer ' + axios.getSecurityTokenData()));
 }
 
 function applyContentTypeHeadersToAxiosRequests() {
-    const headers = axios.defaults.headers;
-    for (let prop in headers) {
-        headers[prop]['Content-Type'] = 'application/json';
-    }
+    const { headers } = axios.defaults;
+    Object.keys(headers).forEach(prop => (headers[prop]['Content-Type'] = 'application/json'));
 }
 
 function clearSecurityHeadersFromAxiosRequests() {
-    const headers = axios.defaults.headers;
+    const { headers } = axios.defaults;
     for (let prop in headers) {
         delete headers[prop]['Authorization'];
     }
@@ -53,7 +49,7 @@ axios.interceptors.response.use(
             return Promise.reject(response.data.exceptionMessage || response.data.value);
         }
 
-        return Promise.resolve(response.data.value);
+        return Promise.resolve(response.data.value || response.data);
     },
     error => {
         if (error.response && error.response.status === 401 && error.response.headers['token-expired']) {

@@ -3,17 +3,19 @@ import { useState } from 'react';
 export class ValidatedField {
     constructor(name, initialValue, validationParams = []) {
         const [value, setValue] = useState(initialValue);
-        const [validateAction, setValidateAction] = useState({});
+        const [events, setEvents] = useState({});
 
         this.name = name;
         this.value = value;
         this.onChange = setValue;
+        this.bindEvents = setEvents;
         this.validation = {
             params: validationParams,
-            bindAction: setValidateAction,
             validate: (customValue, customValidationParams) => {
-                return validateAction.event(customValue || value, customValidationParams || validationParams);
-            }
+                return events.checkValidity(customValue || value, customValidationParams || validationParams);
+            },
+            addCustomError: events.addCustomError,
+            removeCustomError: events.removeCustomError
         };
     }
 

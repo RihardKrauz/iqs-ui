@@ -9,7 +9,7 @@ import { GetHashCode } from '../../../../common/utils/security';
 import { ValidatedField } from '../../../../common/ui-kit/forms/validated-field';
 import { Toaster } from '../../../../common/ui-kit/notification/notifier';
 
-export default props => {
+export default function RegistrationCard({ history }) {
     const [isLoading, setLoading] = useState(false);
 
     const fields = {
@@ -24,10 +24,13 @@ export default props => {
     fields['Password2'].addValidationParam('equal', fields['Password1'].value);
 
     const validateFormAndGetAllErrors = f =>
-        Object.keys(f).map(fieldName => ({
-            name: f[fieldName].name,
-            errors: f[fieldName].validation.validate()
-        }));
+        Object.keys(f).map(fieldName => {
+            const { errors, customErrors } = f[fieldName].validation.validate();
+            return {
+                name: f[fieldName].name,
+                errors: [...errors, ...customErrors]
+            };
+        });
 
     const getErrorsCount = e => e.map(err => err.errors).reduce((acc, val) => acc.concat(val), []).length;
     const getErrorMsg = e =>
@@ -43,9 +46,27 @@ export default props => {
         }
     }
 
+    function validateLoginUniqueness(login) {
+        const loginHasTakenErrorMessage = `Login has been already taken`;
+
+        fields['Login'].validation.removeCustomError(loginHasTakenErrorMessage);
+        http.get(`${http.getApiUri()}/login/${login}`)
+            .then(result => {
+                if (result === true) {
+                    fields['Login'].validation.addCustomError(loginHasTakenErrorMessage);
+                }
+            })
+            .catch(Toaster.notifyError);
+    }
+
+    function onChangeLoginField(e) {
+        fields['Login'].onChange(e);
+        validateLoginUniqueness(e);
+    }
+
     function onBackBtnClick(e) {
         e.preventDefault();
-        props.history.push('/login');
+        history.push('/login');
     }
 
     function saveUser() {
@@ -66,7 +87,7 @@ export default props => {
             })
             .then(() => {
                 setLoading(false);
-                props.history.push('/login');
+                history.push('/login');
             })
             .catch(e => {
                 setLoading(false);
@@ -85,9 +106,10 @@ export default props => {
                     <IqInput
                         data-key="loginField"
                         title="Login"
-                        on-change={fields['Login'].onChange}
+                        debounce-time="500"
+                        on-change={onChangeLoginField}
                         validation={fields['Login'].validation.params}
-                        bind-validate-action={fields['Login'].validation.bindAction}
+                        bind-events={fields['Login'].bindEvents}
                     />
                 </div>
                 <div className="iq-form__item">
@@ -96,7 +118,7 @@ export default props => {
                         title="Name"
                         on-change={fields['Name'].onChange}
                         validation={fields['Name'].validation.params}
-                        bind-validate-action={fields['Name'].validation.bindAction}
+                        bind-events={fields['Name'].bindEvents}
                     />
                 </div>
                 <div className="iq-form__item">
@@ -105,7 +127,7 @@ export default props => {
                         data-key="ageField"
                         on-change={fields['Age'].onChange}
                         validation={fields['Age'].validation.params}
-                        bind-validate-action={fields['Age'].validation.bindAction}
+                        bind-events={fields['Age'].bindEvents}
                         title="Age"
                     />
                 </div>
@@ -118,7 +140,7 @@ export default props => {
                             fields['Password1'].onChange(val);
                             fields['Password2'].validation.validate(val, fields['Password1'].validation.params);
                         }}
-                        bind-validate-action={fields['Password1'].validation.bindAction}
+                        bind-events={fields['Password1'].bindEvents}
                         validation={fields['Password1'].validation.params}
                     />
                 </div>
@@ -131,7 +153,7 @@ export default props => {
                             fields['Password2'].onChange(val);
                             fields['Password1'].validation.validate(val, fields['Password2'].validation.params);
                         }}
-                        bind-validate-action={fields['Password2'].validation.bindAction}
+                        bind-events={fields['Password2'].bindEvents}
                         validation={fields['Password2'].validation.params}
                     />
                 </div>
@@ -154,4 +176,4 @@ export default props => {
             </div>
         </div>
     );
-};
+}

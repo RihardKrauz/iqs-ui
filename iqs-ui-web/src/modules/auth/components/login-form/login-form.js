@@ -8,7 +8,7 @@ import IqTitle from '../../../../common/ui-kit/iq-icon-title/iq-icon-title';
 import IqLoader from '../../../../common/ui-kit/iq-loader/iq-loader';
 import { Toaster } from '../../../../common/ui-kit/notification/notifier';
 
-export default props => {
+export default function LoginForm({ history }) {
     const [isLoading, setLoading] = useState(false);
 
     function onLogin(e) {
@@ -30,18 +30,17 @@ export default props => {
             })
             .then(() => {
                 setLoading(false);
-                props.history.push('/profile');
+                history.push('/profile');
             })
             .catch(e => {
                 setLoading(false);
                 Toaster.notifyError(e);
             });
-            
     }
 
     function onSignUp(e) {
         e.preventDefault();
-        props.history.push('/register');
+        history.push('/register');
     }
 
     return (
@@ -76,4 +75,4 @@ export default props => {
             </div>
         </div>
     );
-};
+}

@@ -17,13 +17,11 @@
     "css-loader": "1.0.0",
     "dotenv": "6.0.0",
     "dotenv-expand": "4.2.0",
-    "eslint": "5.12.0",
     "eslint-config-react-app": "^3.0.7",
     "eslint-loader": "2.1.1",
     "eslint-plugin-flowtype": "2.50.1",
     "eslint-plugin-import": "2.14.0",
     "eslint-plugin-jsx-a11y": "6.1.2",
-    "eslint-plugin-react": "7.12.4",
     "file-loader": "2.0.0",
     "fork-ts-checker-webpack-plugin-alt": "0.4.14",
     "fs-extra": "7.0.1",
@@ -47,6 +45,7 @@
     "react-router-dom": "^4.3.1",
     "react-toastify": "^4.5.2",
     "resolve": "1.10.0",
+    "rxjs": "^6.4.0",
     "style-loader": "0.23.1",
     "terser-webpack-plugin": "1.2.2",
     "url-loader": "1.1.2",
@@ -63,7 +62,48 @@
     "test:karma": "karma start karma.conf.js"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ],
+    "settings": {
+      "react": {
+        "createClass": "createReactClass",
+        "pragma": "React",
+        "version": "detect",
+        "flowVersion": "0.53"
+      },
+      "propWrapperFunctions": [
+        "forbidExtraProps",
+        {
+          "property": "freeze",
+          "object": "Object"
+        },
+        {
+          "property": "myFavoriteWrapper"
+        }
+      ]
+    },
+    "rules": {
+      "prefer-destructuring": 2,
+      "no-console": 0,
+      "react/jsx-uses-react": "error",
+      "react/jsx-uses-vars": "error",
+      "react/prop-types": [
+        1,
+        {
+          "ignore": [
+            "history"
+          ]
+        }
+      ]
+    },
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    }
   },
   "browserslist": [
     ">0.2%",
@@ -126,6 +166,8 @@
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.9.1",
     "enzyme-to-json": "^3.3.5",
+    "eslint": "^5.12.0",
+    "eslint-plugin-react": "^7.12.4",
     "jasmine": "^3.3.1",
     "karma": "^4.0.0",
     "karma-chrome-launcher": "^2.2.0",
