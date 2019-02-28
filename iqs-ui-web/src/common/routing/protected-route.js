@@ -22,5 +22,5 @@ export default function ProtectedRoute({ component: Component, ...rest }) {
 
 ProtectedRoute.propTypes = {
     component: PropTypes.func,
-    location: PropTypes.string
+    location: PropTypes.object
 };

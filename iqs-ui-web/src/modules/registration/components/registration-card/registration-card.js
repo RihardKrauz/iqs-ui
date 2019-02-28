@@ -42,7 +42,9 @@ export default function RegistrationCard({ history }) {
         if (getErrorsCount(errors) === 0) {
             saveUser();
         } else {
-            Toaster.notifyError(getErrorMsg(errors).join('\r\n'));
+            getErrorMsg(errors)
+                .filter(e => e !== '')
+                .forEach(Toaster.notifyError);
         }
     }
 
