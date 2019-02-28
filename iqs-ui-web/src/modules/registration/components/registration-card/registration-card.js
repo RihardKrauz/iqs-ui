@@ -4,12 +4,14 @@ import IqInput from '../../../../common/ui-kit/iq-input/iq-input';
 import IqLoader from '../../../../common/ui-kit/iq-loader/iq-loader';
 import './registration-card.scss';
 import '../../../../common/styles/iq-form.scss';
-import http from '../../../../services/axios-http';
-import { GetHashCode } from '../../../../common/utils/security';
+import http from '../../../../common/services/axios-http';
+import { GetHashCode } from '../../../../common/services/security';
 import { ValidatedField } from '../../../../common/ui-kit/forms/validated-field';
 import { Toaster } from '../../../../common/ui-kit/notification/notifier';
+import { connect } from 'react-redux';
+import { changeLogin } from '../../store/actions/user-registration.actions';
 
-export default function RegistrationCard({ history }) {
+const RegistrationCard = ({ history, dispatch }) => {
     const [isLoading, setLoading] = useState(false);
 
     const fields = {
@@ -63,6 +65,7 @@ export default function RegistrationCard({ history }) {
 
     function onChangeLoginField(e) {
         fields['Login'].onChange(e);
+        dispatch(changeLogin(e));
         validateLoginUniqueness(e);
     }
 
@@ -178,4 +181,6 @@ export default function RegistrationCard({ history }) {
             </div>
         </div>
     );
-}
+};
+
+export default connect()(RegistrationCard);

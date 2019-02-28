@@ -42,8 +42,10 @@
     "react-app-polyfill": "^0.2.1",
     "react-dev-utils": "^7.0.3",
     "react-dom": "^16.8.1",
+    "react-redux": "^6.0.1",
     "react-router-dom": "^4.3.1",
     "react-toastify": "^4.5.2",
+    "redux": "^4.0.1",
     "resolve": "1.10.0",
     "rxjs": "^6.4.0",
     "style-loader": "0.23.1",
@@ -87,6 +89,9 @@
     },
     "rules": {
       "prefer-destructuring": 2,
+      "no-param-reassign": 1,
+      "prefer-spread": 1,
+      "import/no-mutable-exports": 2,
       "no-console": 0,
       "react/jsx-uses-react": "error",
       "react/jsx-uses-vars": "error",
@@ -94,7 +99,8 @@
         1,
         {
           "ignore": [
-            "history"
+            "history",
+            "dispatch"
           ]
         }
       ]
@@ -176,6 +182,7 @@
     "karma-requirejs": "^1.1.0",
     "mocha": "^6.0.0",
     "node-sass": "^4.11.0",
+    "redux-devtools-extension": "^2.13.8",
     "requirejs": "^2.3.6",
     "sass-loader": "^7.1.0"
   }

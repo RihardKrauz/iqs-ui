@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './profile-card.scss';
-import http from '../../../../services/axios-http';
-import { STORAGE_KEYS } from '../../../../services/storage';
+import http from '../../../../common/services/axios-http';
+import { STORAGE_KEYS } from '../../../../common/services/storage';
 
 export default () => {
     const [personData, setPersonData] = useState({ department: {}, grade: {} });

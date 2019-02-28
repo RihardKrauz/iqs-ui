@@ -60,10 +60,7 @@ export default class IqInput extends React.Component {
         });
     }
 
-    checkValidity(val, customValidationProps) {
-        val = val || '';
-        customValidationProps = customValidationProps || this.props['validation'];
-
+    checkValidity(val = '', customValidationProps = this.props['validation']) {
         if (customValidationProps) {
             const errorList = customValidationProps
                 .map(validationItem => {

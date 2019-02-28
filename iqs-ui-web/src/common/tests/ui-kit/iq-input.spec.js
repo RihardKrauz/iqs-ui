@@ -1,6 +1,6 @@
 import React from 'react';
 import { configure, shallow } from 'enzyme';
-import IqInput from '../../common/ui-kit/iq-input/iq-input';
+import IqInput from '../ui-kit/iq-input/iq-input';
 import Adapter from 'enzyme-adapter-react-16';
 import { shallowToJson } from 'enzyme-to-json';
 

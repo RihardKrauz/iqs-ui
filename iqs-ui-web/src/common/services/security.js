@@ -17,6 +17,8 @@
  * See csrc.nist.gov/groups/ST/toolkit/secure_hashing.html
  *     csrc.nist.gov/groups/ST/toolkit/examples.html
  */
+
+/* eslint-disable */
 class Sha256 {
     /**
      * Generates SHA-256 hash of string.
@@ -256,6 +258,7 @@ class Sha256 {
         return (x & y) ^ (x & z) ^ (y & z);
     } // 'majority'
 }
+/* eslint-enable */
 
 export const GetHashCode = function(str) {
     return Sha256.hash(str);

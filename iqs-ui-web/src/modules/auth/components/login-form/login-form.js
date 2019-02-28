@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import http from '../../../../services/axios-http';
-import './login-form.scss';
-import '../../../../common/styles/iq-form.scss';
-import { GetHashCode } from '../../../../common/utils/security';
+import { GetHashCode } from '../../../../common/services/security';
+import http from '../../../../common/services/axios-http';
 import IqInput from '../../../../common/ui-kit/iq-input/iq-input';
 import IqTitle from '../../../../common/ui-kit/iq-icon-title/iq-icon-title';
 import IqLoader from '../../../../common/ui-kit/iq-loader/iq-loader';
 import { Toaster } from '../../../../common/ui-kit/notification/notifier';
+import { connect } from 'react-redux';
+import { changeCurrentUser } from '../../store/actions/auth.actions';
 
-export default function LoginForm({ history }) {
+import './login-form.scss';
+import '../../../../common/styles/iq-form.scss';
+
+const LoginForm = ({ history, dispatch }) => {
     const [isLoading, setLoading] = useState(false);
 
     function onLogin(e) {
@@ -26,6 +29,7 @@ export default function LoginForm({ history }) {
         http.post(`${http.getApiUri()}/token`, authData)
             .then(response => {
                 Toaster.notifySuccess('Successfully authenticated');
+                dispatch(changeCurrentUser(response.username));
                 http.setSecurityTokenData(response);
             })
             .then(() => {
@@ -75,4 +79,6 @@ export default function LoginForm({ history }) {
             </div>
         </div>
     );
-}
+};
+
+export default connect()(LoginForm);
