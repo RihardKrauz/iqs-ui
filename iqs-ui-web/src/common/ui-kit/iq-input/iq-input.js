@@ -126,6 +126,8 @@ export default class IqInput extends React.Component {
                 distinctUntilChanged()
             )
             .subscribe(val => {
+                this.setValue(val);
+                this.checkValidity(val);
                 if (this.props['on-change']) {
                     this.props['on-change'](val);
                 }
@@ -138,8 +140,7 @@ export default class IqInput extends React.Component {
 
     onChangeInput(e) {
         const { value } = e.currentTarget;
-        this.setValue(value);
-        this.checkValidity(value);
+
         this.input$.next(value);
     }
 

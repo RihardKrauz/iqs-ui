@@ -7,9 +7,11 @@ import '../../../../common/styles/iq-form.scss';
 import http from '../../../../common/services/axios-http';
 import { GetHashCode } from '../../../../common/services/security';
 import { ValidatedField } from '../../../../common/ui-kit/forms/validated-field';
-import { Toaster } from '../../../../common/ui-kit/notification/notifier';
 import { connect } from 'react-redux';
-import { changeLogin } from '../../store/actions/user-registration.actions';
+import { changeLogin, addError, clearErrors } from '../../store/actions/user-registration.actions';
+import { notifySuccessMessage, notifyErrorMessage } from '../../../../common/store/actions/notifier.actions';
+
+const DEBOUNCE_TIME_IN_MS = 500;
 
 const RegistrationCard = ({ history, dispatch }) => {
     const [isLoading, setLoading] = useState(false);
@@ -45,8 +47,8 @@ const RegistrationCard = ({ history, dispatch }) => {
             saveUser();
         } else {
             getErrorMsg(errors)
-                .filter(e => e !== '')
-                .forEach(Toaster.notifyError);
+                .filter(em => em !== '')
+                .forEach(em => dispatch(notifyErrorMessage(em)));
         }
     }
 
@@ -60,8 +62,17 @@ const RegistrationCard = ({ history, dispatch }) => {
                     fields['Login'].validation.addCustomError(loginHasTakenErrorMessage);
                 }
             })
-            .catch(Toaster.notifyError);
+            .catch(e => dispatch(notifyErrorMessage(e)));
     }
+
+    const setErrorState = field => {
+        return (errorList = []) => {
+            dispatch(clearErrors({ fieldName: field.name }));
+            errorList.forEach(e => {
+                dispatch(addError({ fieldName: field.name, message: e }));
+            });
+        };
+    };
 
     function onChangeLoginField(e) {
         fields['Login'].onChange(e);
@@ -88,7 +99,7 @@ const RegistrationCard = ({ history, dispatch }) => {
 
         http.post(`${http.getApiUri()}/user`, userData)
             .then(() => {
-                Toaster.notifySuccess('Successfully created');
+                dispatch(notifySuccessMessage('Successfully created'));
             })
             .then(() => {
                 setLoading(false);
@@ -96,7 +107,7 @@ const RegistrationCard = ({ history, dispatch }) => {
             })
             .catch(e => {
                 setLoading(false);
-                Toaster.notifyError(e);
+                dispatch(notifyErrorMessage(e));
             });
     }
 
@@ -111,8 +122,9 @@ const RegistrationCard = ({ history, dispatch }) => {
                     <IqInput
                         data-key="loginField"
                         title="Login"
-                        debounce-time="500"
+                        debounce-time={DEBOUNCE_TIME_IN_MS}
                         on-change={onChangeLoginField}
+                        on-validate={setErrorState(fields['Login'])}
                         validation={fields['Login'].validation.params}
                         bind-events={fields['Login'].bindEvents}
                     />
@@ -121,7 +133,9 @@ const RegistrationCard = ({ history, dispatch }) => {
                     <IqInput
                         data-key="nameField"
                         title="Name"
+                        debounce-time={DEBOUNCE_TIME_IN_MS}
                         on-change={fields['Name'].onChange}
+                        on-validate={setErrorState(fields['Name'])}
                         validation={fields['Name'].validation.params}
                         bind-events={fields['Name'].bindEvents}
                     />
@@ -130,7 +144,9 @@ const RegistrationCard = ({ history, dispatch }) => {
                     <IqInput
                         data-type="number"
                         data-key="ageField"
+                        debounce-time={DEBOUNCE_TIME_IN_MS}
                         on-change={fields['Age'].onChange}
+                        on-validate={setErrorState(fields['Age'])}
                         validation={fields['Age'].validation.params}
                         bind-events={fields['Age'].bindEvents}
                         title="Age"
@@ -141,11 +157,13 @@ const RegistrationCard = ({ history, dispatch }) => {
                         data-type="password"
                         data-key="pass1Field"
                         title="Enter password"
+                        debounce-time={DEBOUNCE_TIME_IN_MS}
                         on-change={val => {
                             fields['Password1'].onChange(val);
                             fields['Password2'].validation.validate(val, fields['Password1'].validation.params);
                         }}
                         bind-events={fields['Password1'].bindEvents}
+                        on-validate={setErrorState(fields['Password1'])}
                         validation={fields['Password1'].validation.params}
                     />
                 </div>
@@ -154,11 +172,13 @@ const RegistrationCard = ({ history, dispatch }) => {
                         data-type="password"
                         data-key="pass2Field"
                         title="Repeat password"
+                        debounce-time={DEBOUNCE_TIME_IN_MS}
                         on-change={val => {
                             fields['Password2'].onChange(val);
                             fields['Password1'].validation.validate(val, fields['Password2'].validation.params);
                         }}
                         bind-events={fields['Password2'].bindEvents}
+                        on-validate={setErrorState(fields['Password2'])}
                         validation={fields['Password2'].validation.params}
                     />
                 </div>

@@ -30,20 +30,4 @@
     border: solid 1px #cecece;
     border-radius: 4px;
     display: flex;
-
-    &__range {
-        display: flex;
-    }
-
-    &__grade-item {
-        width: 4em;
-        margin: 0.2em;
-        color: #999999;
-        border-bottom: solid 2px #999999;
-
-        &.obtained {
-            color: #000;
-            border-bottom-color: #000;
-        }
-    }
 }
