@@ -2,10 +2,12 @@ import {
     CHANGE_LOGIN,
     CHANGE_NAME,
     ADD_GENERIC_ERROR,
-    CLEAR_GENERIC_ERRORS,
+    CLEAR_ERRORS,
     REMOVE_GENERIC_ERROR,
     ADD_CUSTOM_ERROR,
-    REMOVE_CUSTOM_ERROR
+    REMOVE_CUSTOM_ERROR,
+    START_LOADING,
+    END_LOADING
 } from '../actions/user-registration.actions';
 
 const initialState = {
@@ -14,53 +16,55 @@ const initialState = {
     age: 0,
     password1: '',
     password2: '',
+    isLoading: false,
     errors: {}
 };
 
-const createError = (field, errorType, message) => {
-    let error;
-
-    if (field) {
-        error = field[errorType].concat([message]);
-    } else {
-        const result = {};
-        result[errorType] = [message];
-        error = result;
+const applyFieldErrorByType = (state, fieldName, errorType, message) => {
+    let result = state;
+    if (!result[fieldName]) {
+        result[fieldName] = {};
     }
-    return error;
+    if (!result[fieldName][errorType]) {
+        result[fieldName][errorType] = [];
+    }
+
+    result[fieldName][errorType] = [...result[fieldName][errorType], message];
+    return result;
 };
 
-const removeError = (field, errorType, message) => {
-    const values = field[errorType] || [];
-    return values.filter(v => v !== message);
+const removeFieldErrorByType = (state, fieldName, errorType, message) => {
+    let result = state;
+    if (!result[fieldName]) {
+        result[fieldName] = {};
+    }
+    if (!result[fieldName][errorType]) {
+        result[fieldName][errorType] = [];
+    }
+
+    result[fieldName][errorType] = [...result[fieldName][errorType].filter(msg => msg !== message)];
+    return result;
 };
 
 const errorsReducer = (state = initialState.errors, action) => {
     switch (action.type) {
         case ADD_GENERIC_ERROR: {
             const { fieldName, message } = action.payload;
-            state[fieldName] = createError(state[fieldName], 'generic', message);
-            return state;
+            return applyFieldErrorByType(state, fieldName, 'generic', message);
         }
         case REMOVE_GENERIC_ERROR: {
             const { fieldName, message } = action.payload;
-            if (!state[fieldName]) return state;
-            state[fieldName] = removeError(state[fieldName], 'generic', message);
-            return state;
+            return removeFieldErrorByType(state, fieldName, 'generic', message);
         }
         case ADD_CUSTOM_ERROR: {
             const { field, message } = action.payload;
-            state[field.name] = createError(state[field.name], 'custom', message);
-            return state;
+            return applyFieldErrorByType(state, field.name, 'custom', message);
         }
         case REMOVE_CUSTOM_ERROR: {
             const { field, message } = action.payload;
-            if (!state[field.name]) return state;
-            state[field.name] = removeError(state[field.name], 'custom', message);
-            return state;
+            return removeFieldErrorByType(state, field.name, 'custom', message);
         }
-        case CLEAR_GENERIC_ERRORS: {
-            // todo: clear only generic errors, not custom
+        case CLEAR_ERRORS: {
             const { fieldName } = action.payload;
             if (fieldName) {
                 delete state[fieldName];
@@ -80,6 +84,10 @@ const userRegistrationReducer = (state = initialState, action) => {
             return { ...state, login: action.payload.value };
         case CHANGE_NAME:
             return { ...state, name: action.payload };
+        case START_LOADING:
+            return { ...state, isLoading: true };
+        case END_LOADING:
+            return { ...state, isLoading: false };
         default:
             return { ...state, errors: errorsReducer(state.errors, action) };
     }

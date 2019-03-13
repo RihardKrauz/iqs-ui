@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import IqTitle from '../../../../common/ui-kit/iq-icon-title/iq-icon-title';
 import IqInput from '../../../../common/ui-kit/iq-input/iq-input';
 import IqLoader from '../../../../common/ui-kit/iq-loader/iq-loader';
@@ -8,16 +8,20 @@ import http from '../../../../common/services/axios-http';
 import { GetHashCode } from '../../../../common/services/security';
 import { ValidatedField } from '../../../../common/ui-kit/forms/validated-field';
 import { connect } from 'react-redux';
-import { changeLogin, addGenericError, clearGenericErrors } from '../../store/actions/user-registration.actions';
+import {
+    changeLogin,
+    addGenericError,
+    clearErrors,
+    startLoading,
+    endLoading
+} from '../../store/actions/user-registration.actions';
 import { showSuccessMessage, showErrorMessage } from '../../../../common/store/actions/notifier.actions';
-import { getErrorsMessages } from '../../store/selectors/user-registration.selector';
+import { getErrorMessages } from '../../store/selectors/user-registration.selector';
 
 const DEBOUNCE_TIME_IN_MS = '500';
 
 /* eslint react/prop-types: 0 */
-const RegistrationCard = ({ errorsMessages, history, dispatch }) => {
-    const [isLoading, setLoading] = useState(false);
-
+const RegistrationCard = ({ isBusy, errorMessages, history, dispatch }) => {
     const fields = {
         Login: new ValidatedField('Login', '', [{ type: 'required' }]),
         Name: new ValidatedField('Name', '', [{ type: 'required' }, { type: 'length', value: 5 }]),
@@ -46,13 +50,16 @@ const RegistrationCard = ({ errorsMessages, history, dispatch }) => {
         if (getErrorsCount(errors) === 0) {
             saveUser();
         } else {
-            errorsMessages.filter(em => em !== '').forEach(em => dispatch(showErrorMessage(em)));
+            errors
+                .filter(err => err.errors.length > 0)
+                .map(err => `Errors in field '${err.name}': ${err.errors.join(', ')}`)
+                .forEach(em => dispatch(showErrorMessage(em)));
         }
     }
 
     const setErrorState = field => {
         return (errorList = []) => {
-            dispatch(clearGenericErrors({ fieldName: field.name }));
+            dispatch(clearErrors({ fieldName: field.name }));
             errorList.forEach(e => {
                 dispatch(addGenericError({ fieldName: field.name, message: e }));
             });
@@ -79,26 +86,26 @@ const RegistrationCard = ({ errorsMessages, history, dispatch }) => {
             password: GetHashCode(fields['Password1'].value)
         });
 
-        setLoading(true);
+        dispatch(startLoading());
 
         http.post(`${http.getApiUri()}/user`, userData)
             .then(() => {
                 dispatch(showSuccessMessage('Successfully created'));
             })
             .then(() => {
-                setLoading(false);
+                dispatch(endLoading());
                 history.push('/login');
             })
             .catch(e => {
-                setLoading(false);
+                dispatch(endLoading());
                 dispatch(showErrorMessage(e));
             });
     }
 
     return (
         <div className="register-layout">
-            {isLoading === true ? <IqLoader /> : ''}
-            <div className={`iq-form ${isLoading === true ? 'busy' : ''}`}>
+            {isBusy === true ? <IqLoader /> : ''}
+            <div className={`iq-form ${isBusy === true ? 'busy' : ''}`}>
                 <div className="iq-form__item">
                     <IqTitle content="Create user" fa-icon-key="far fa-edit" color="rgb(98, 77, 206)" />
                 </div>
@@ -189,7 +196,8 @@ const RegistrationCard = ({ errorsMessages, history, dispatch }) => {
 
 const mapStateToProps = state => {
     return {
-        errorsMessages: getErrorsMessages(state)
+        errorsMessages: getErrorMessages(state),
+        isBusy: state.isLoading
     };
 };
 

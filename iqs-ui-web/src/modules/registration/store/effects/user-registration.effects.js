@@ -25,6 +25,7 @@ const checkLoginUniqueness = store => next => action => {
     return next(action);
 };
 
+// todo: move custom errors to iq-input store
 const applyFieldCustomError = store => next => action => {
     if (action.type === ADD_CUSTOM_ERROR) {
         action.payload.field.validation.addCustomError(action.payload.message);
