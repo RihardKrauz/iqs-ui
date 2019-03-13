@@ -9,11 +9,13 @@ import { GetHashCode } from '../../../../common/services/security';
 import { ValidatedField } from '../../../../common/ui-kit/forms/validated-field';
 import { connect } from 'react-redux';
 import { changeLogin, addError, clearErrors } from '../../store/actions/user-registration.actions';
-import { notifySuccessMessage, notifyErrorMessage } from '../../../../common/store/actions/notifier.actions';
+import { showSuccessMessage, showErrorMessage } from '../../../../common/store/actions/notifier.actions';
+import { getErrorsMessages, getErrorsCount } from '../../store/selectors/user-registration.selector';
 
-const DEBOUNCE_TIME_IN_MS = 500;
+const DEBOUNCE_TIME_IN_MS = '500';
 
-const RegistrationCard = ({ history, dispatch }) => {
+/* eslint-disable */
+const RegistrationCard = ({ errorsCount, errorsMessages, history, dispatch }) => {
     const [isLoading, setLoading] = useState(false);
 
     const fields = {
@@ -36,34 +38,34 @@ const RegistrationCard = ({ history, dispatch }) => {
             };
         });
 
-    const getErrorsCount = e => e.map(err => err.errors).reduce((acc, val) => acc.concat(val), []).length;
-    const getErrorMsg = e =>
-        e.map(err => (err.errors.length > 0 ? `Errors in field '${err.name}': ${err.errors.join(', ')}` : ''));
+    // const getErrorsCount = e => e.map(err => err.errors).reduce((acc, val) => acc.concat(val), []).length;
+    // const getErrorMsg = e =>
+    //     e.map(err => (err.errors.length > 0 ? `Errors in field '${err.name}': ${err.errors.join(', ')}` : ''));
 
     function onCreateBtnClick(e) {
         e.preventDefault();
         const errors = validateFormAndGetAllErrors(fields);
-        if (getErrorsCount(errors) === 0) {
+        if (errorsCount === 0) {
             saveUser();
         } else {
-            getErrorMsg(errors)
-                .filter(em => em !== '')
-                .forEach(em => dispatch(notifyErrorMessage(em)));
+            errorsMessages.filter(em => em !== '').forEach(em => dispatch(showErrorMessage(em)));
         }
     }
 
-    function validateLoginUniqueness(login) {
-        const loginHasTakenErrorMessage = `Login has been already taken`;
+    // function validateLoginUniqueness(login) {
+    //     const loginHasTakenErrorMessage = `Login has been already taken`;
 
-        fields['Login'].validation.removeCustomError(loginHasTakenErrorMessage);
-        http.get(`${http.getApiUri()}/login/${login}`)
-            .then(result => {
-                if (result === true) {
-                    fields['Login'].validation.addCustomError(loginHasTakenErrorMessage);
-                }
-            })
-            .catch(e => dispatch(notifyErrorMessage(e)));
-    }
+    //     dispatch(removeCustomError({ field: fields['Login'], message: loginHasTakenErrorMessage }));
+    //     // fields['Login'].validation.removeCustomError(loginHasTakenErrorMessage);
+    //     http.get(`${http.getApiUri()}/login/${login}`)
+    //         .then(result => {
+    //             if (result === true) {
+    //                 dispatch(addCustomError({ field: fields['Login'], message: loginHasTakenErrorMessage }));
+    //                 // fields['Login'].validation.addCustomError(loginHasTakenErrorMessage);
+    //             }
+    //         })
+    //         .catch(e => dispatch(showErrorMessage(e)));
+    // }
 
     const setErrorState = field => {
         return (errorList = []) => {
@@ -76,8 +78,8 @@ const RegistrationCard = ({ history, dispatch }) => {
 
     function onChangeLoginField(e) {
         fields['Login'].onChange(e);
-        dispatch(changeLogin(e));
-        validateLoginUniqueness(e);
+        dispatch(changeLogin({ field: fields['Login'], value: e }));
+        // validateLoginUniqueness(e);
     }
 
     function onBackBtnClick(e) {
@@ -99,7 +101,7 @@ const RegistrationCard = ({ history, dispatch }) => {
 
         http.post(`${http.getApiUri()}/user`, userData)
             .then(() => {
-                dispatch(notifySuccessMessage('Successfully created'));
+                dispatch(showSuccessMessage('Successfully created'));
             })
             .then(() => {
                 setLoading(false);
@@ -107,7 +109,7 @@ const RegistrationCard = ({ history, dispatch }) => {
             })
             .catch(e => {
                 setLoading(false);
-                dispatch(notifyErrorMessage(e));
+                dispatch(showErrorMessage(e));
             });
     }
 
@@ -203,4 +205,11 @@ const RegistrationCard = ({ history, dispatch }) => {
     );
 };
 
-export default connect()(RegistrationCard);
+const mapStateToProps = state => {
+    return {
+        errorsCount: getErrorsCount(state),
+        errorsMessages: getErrorsMessages(state)
+    };
+};
+
+export default connect(mapStateToProps)(RegistrationCard);
