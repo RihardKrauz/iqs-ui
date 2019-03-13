@@ -1,9 +1,9 @@
 import {
     CHANGE_LOGIN,
     CHANGE_NAME,
-    ADD_ERROR,
-    CLEAR_ERRORS,
-    REMOVE_ERROR,
+    ADD_GENERIC_ERROR,
+    CLEAR_GENERIC_ERRORS,
+    REMOVE_GENERIC_ERROR,
     ADD_CUSTOM_ERROR,
     REMOVE_CUSTOM_ERROR
 } from '../actions/user-registration.actions';
@@ -37,15 +37,15 @@ const removeError = (field, errorType, message) => {
 
 const errorsReducer = (state = initialState.errors, action) => {
     switch (action.type) {
-        case ADD_ERROR: {
+        case ADD_GENERIC_ERROR: {
             const { fieldName, message } = action.payload;
-            state[fieldName] = createError(state[fieldName], 'general', message);
+            state[fieldName] = createError(state[fieldName], 'generic', message);
             return state;
         }
-        case REMOVE_ERROR: {
+        case REMOVE_GENERIC_ERROR: {
             const { fieldName, message } = action.payload;
             if (!state[fieldName]) return state;
-            state[fieldName] = removeError(state[fieldName], 'general', message);
+            state[fieldName] = removeError(state[fieldName], 'generic', message);
             return state;
         }
         case ADD_CUSTOM_ERROR: {
@@ -59,7 +59,8 @@ const errorsReducer = (state = initialState.errors, action) => {
             state[field.name] = removeError(state[field.name], 'custom', message);
             return state;
         }
-        case CLEAR_ERRORS: {
+        case CLEAR_GENERIC_ERRORS: {
+            // todo: clear only generic errors, not custom
             const { fieldName } = action.payload;
             if (fieldName) {
                 delete state[fieldName];

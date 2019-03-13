@@ -8,14 +8,14 @@ import http from '../../../../common/services/axios-http';
 import { GetHashCode } from '../../../../common/services/security';
 import { ValidatedField } from '../../../../common/ui-kit/forms/validated-field';
 import { connect } from 'react-redux';
-import { changeLogin, addError, clearErrors } from '../../store/actions/user-registration.actions';
+import { changeLogin, addGenericError, clearGenericErrors } from '../../store/actions/user-registration.actions';
 import { showSuccessMessage, showErrorMessage } from '../../../../common/store/actions/notifier.actions';
-import { getErrorsMessages, getErrorsCount } from '../../store/selectors/user-registration.selector';
+import { getErrorsMessages } from '../../store/selectors/user-registration.selector';
 
 const DEBOUNCE_TIME_IN_MS = '500';
 
-/* eslint-disable */
-const RegistrationCard = ({ errorsCount, errorsMessages, history, dispatch }) => {
+/* eslint react/prop-types: 0 */
+const RegistrationCard = ({ errorsMessages, history, dispatch }) => {
     const [isLoading, setLoading] = useState(false);
 
     const fields = {
@@ -38,40 +38,23 @@ const RegistrationCard = ({ errorsCount, errorsMessages, history, dispatch }) =>
             };
         });
 
-    // const getErrorsCount = e => e.map(err => err.errors).reduce((acc, val) => acc.concat(val), []).length;
-    // const getErrorMsg = e =>
-    //     e.map(err => (err.errors.length > 0 ? `Errors in field '${err.name}': ${err.errors.join(', ')}` : ''));
+    const getErrorsCount = e => e.map(err => err.errors).reduce((acc, val) => acc.concat(val), []).length;
 
     function onCreateBtnClick(e) {
         e.preventDefault();
         const errors = validateFormAndGetAllErrors(fields);
-        if (errorsCount === 0) {
+        if (getErrorsCount(errors) === 0) {
             saveUser();
         } else {
             errorsMessages.filter(em => em !== '').forEach(em => dispatch(showErrorMessage(em)));
         }
     }
 
-    // function validateLoginUniqueness(login) {
-    //     const loginHasTakenErrorMessage = `Login has been already taken`;
-
-    //     dispatch(removeCustomError({ field: fields['Login'], message: loginHasTakenErrorMessage }));
-    //     // fields['Login'].validation.removeCustomError(loginHasTakenErrorMessage);
-    //     http.get(`${http.getApiUri()}/login/${login}`)
-    //         .then(result => {
-    //             if (result === true) {
-    //                 dispatch(addCustomError({ field: fields['Login'], message: loginHasTakenErrorMessage }));
-    //                 // fields['Login'].validation.addCustomError(loginHasTakenErrorMessage);
-    //             }
-    //         })
-    //         .catch(e => dispatch(showErrorMessage(e)));
-    // }
-
     const setErrorState = field => {
         return (errorList = []) => {
-            dispatch(clearErrors({ fieldName: field.name }));
+            dispatch(clearGenericErrors({ fieldName: field.name }));
             errorList.forEach(e => {
-                dispatch(addError({ fieldName: field.name, message: e }));
+                dispatch(addGenericError({ fieldName: field.name, message: e }));
             });
         };
     };
@@ -79,7 +62,6 @@ const RegistrationCard = ({ errorsCount, errorsMessages, history, dispatch }) =>
     function onChangeLoginField(e) {
         fields['Login'].onChange(e);
         dispatch(changeLogin({ field: fields['Login'], value: e }));
-        // validateLoginUniqueness(e);
     }
 
     function onBackBtnClick(e) {
@@ -207,7 +189,6 @@ const RegistrationCard = ({ errorsCount, errorsMessages, history, dispatch }) =>
 
 const mapStateToProps = state => {
     return {
-        errorsCount: getErrorsCount(state),
         errorsMessages: getErrorsMessages(state)
     };
 };
