@@ -13,13 +13,17 @@ const checkLoginUniqueness = store => next => action => {
         const loginHasTakenErrorMessage = `Login has been already taken`;
 
         store.dispatch(removeCustomError({ field: action.payload.field, message: loginHasTakenErrorMessage }));
-        http.get(`${http.getApiUri()}/login/${action.payload.value}`)
-            .then(result => {
-                if (result === true) {
-                    store.dispatch(addCustomError({ field: action.payload.field, message: loginHasTakenErrorMessage }));
-                }
-            })
-            .catch(e => store.dispatch(showErrorMessage(e)));
+        if (action.payload.value) {
+            http.get(`${http.getApiUri()}/users/${action.payload.value}/exists`)
+                .then(result => {
+                    if (result === true) {
+                        store.dispatch(
+                            addCustomError({ field: action.payload.field, message: loginHasTakenErrorMessage })
+                        );
+                    }
+                })
+                .catch(e => store.dispatch(showErrorMessage(e)));
+        }
     }
 
     return next(action);

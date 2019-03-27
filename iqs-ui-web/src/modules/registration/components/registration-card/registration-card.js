@@ -88,7 +88,7 @@ const RegistrationCard = ({ isBusy, errorMessages, history, dispatch }) => {
 
         dispatch(startLoading());
 
-        http.post(`${http.getApiUri()}/user`, userData)
+        http.post(`${http.getApiUri()}/users`, userData)
             .then(() => {
                 dispatch(showSuccessMessage('Successfully created'));
             })

@@ -21,6 +21,13 @@ const initialState = {
 };
 
 const applyFieldErrorByType = (state, fieldName, errorType, message) => {
+    /* todo: try it
+    state[fieldName] = {
+        ...state[fieldName],
+        generic: [...((state[fieldName] || {}).generic || []), ...data]
+    };
+     */
+
     let result = state;
     if (!result[fieldName]) {
         result[fieldName] = {};

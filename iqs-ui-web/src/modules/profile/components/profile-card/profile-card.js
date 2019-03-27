@@ -26,12 +26,12 @@ class ProfileCard extends React.Component {
     }
 
     componentDidMount() {
-        http.get(`${http.getApiUri()}/user/${localStorage.getItem(STORAGE_KEYS.CURRENT_USER)}`)
+        http.get(`${http.getApiUri()}/users/${localStorage.getItem(STORAGE_KEYS.CURRENT_USER)}`)
             .then(response => {
                 this.setPersonData({ ...response });
             })
             .then(() => {
-                http.get(`${http.getApiUri()}/specialization/1/grades`).then(response => {
+                http.get(`${http.getApiUri()}/specializations/1/grades`).then(response => {
                     this.setGrades(response);
                 });
             });
