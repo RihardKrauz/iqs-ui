@@ -1,7 +1,7 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
 import './iq-input.scss';
-import { Subject } from 'rxjs';
+import { Subject, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 const ErrorItem = props => <li className="iq-input__error-item">{props.value}</li>;
@@ -135,7 +135,12 @@ export default class IqInput extends React.Component {
     }
 
     componentWillUnmount() {
-        this.inputChangeSubscription.unsubscribe();
+        if (this.inputChangeSubscription) {
+            this.inputChangeSubscription.unsubscribe();
+        }
+        if (this.focusTimerSubscription) {
+            this.focusTimerSubscription.unsubscribe();
+        }
     }
 
     onChangeInput(e) {
@@ -149,7 +154,9 @@ export default class IqInput extends React.Component {
     }
 
     onBlurInput() {
-        this.setFocused(false);
+        this.focusTimerSubscription = timer(this.props['debounce-time']).subscribe(() => {
+            this.setFocused(false);
+        });
     }
 
     render() {

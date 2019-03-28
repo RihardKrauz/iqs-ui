@@ -2,6 +2,7 @@ import React from 'react';
 import IqTitle from '../../../../common/ui-kit/iq-icon-title/iq-icon-title';
 import IqInput from '../../../../common/ui-kit/iq-input/iq-input';
 import IqLoader from '../../../../common/ui-kit/iq-loader/iq-loader';
+import IqSelect from '../../../../common/ui-kit/iq-select/iq-select';
 import './registration-card.scss';
 import '../../../../common/styles/iq-form.scss';
 import http from '../../../../common/services/axios-http';
@@ -22,6 +23,40 @@ const DEBOUNCE_TIME_IN_MS = '500';
 
 /* eslint react/prop-types: 0 */
 const RegistrationCard = ({ isBusy, errorMessages, history, dispatch }) => {
+    const [spec, setSpec] = React.useState('');
+    const [specList, setSpecList] = React.useState([]);
+
+    const [department, setDepartment] = React.useState('');
+    const [departmentList, setDepartmentList] = React.useState([]);
+
+    React.useEffect(() => {
+        http.get(`${http.getApiUri()}/specializations`)
+            .then(values => {
+                const items = values.map(v => ({ id: v.id, title: v.name }));
+                setSpecList(items);
+
+                if (items.length > 0) {
+                    setSpec(items[0].id);
+                } else {
+                    dispatch(showErrorMessage('Cant find any specializations in database'));
+                }
+            })
+            .catch(e => dispatch(showErrorMessage(e)));
+
+        http.get(`${http.getApiUri()}/departments`)
+            .then(values => {
+                const items = values.map(v => ({ id: v.id, title: v.name }));
+                setDepartmentList(items);
+
+                if (items.length > 0) {
+                    setDepartment(items[0].id);
+                } else {
+                    dispatch(showErrorMessage('Cant find any departments in database'));
+                }
+            })
+            .catch(e => dispatch(showErrorMessage(e)));
+    }, []);
+
     const fields = {
         Login: new ValidatedField('Login', '', [{ type: 'required' }]),
         Name: new ValidatedField('Name', '', [{ type: 'required' }, { type: 'length', value: 5 }]),
@@ -76,12 +111,22 @@ const RegistrationCard = ({ isBusy, errorMessages, history, dispatch }) => {
         history.push('/login');
     }
 
+    function onSpecificationChange(e) {
+        setSpec(e.target.value);
+    }
+
+    function onDepartmentChange(e) {
+        setDepartment(e.target.value);
+    }
+
     function saveUser() {
         const userData = JSON.stringify({
             user: {
                 login: fields['Login'].value,
                 name: fields['Name'].value,
-                age: fields['Age'].value
+                age: fields['Age'].value,
+                specializationId: spec,
+                departmentId: department
             },
             password: GetHashCode(fields['Password1'].value)
         });
@@ -141,6 +186,22 @@ const RegistrationCard = ({ isBusy, errorMessages, history, dispatch }) => {
                         validation={fields['Age'].validation.params}
                         bind-events={fields['Age'].bindEvents}
                         title="Age"
+                    />
+                </div>
+                <div className="iq-form__item">
+                    <IqSelect
+                        title="Specialization"
+                        id="specField"
+                        items={specList}
+                        handleChange={onSpecificationChange}
+                    />
+                </div>
+                <div className="iq-form__item">
+                    <IqSelect
+                        title="Department"
+                        id="deptField"
+                        items={departmentList}
+                        handleChange={onDepartmentChange}
                     />
                 </div>
                 <div className="iq-form__item">
