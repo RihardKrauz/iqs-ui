@@ -2,19 +2,21 @@ import React from 'react';
 import './profile-card.scss';
 import http from '../../../../common/services/axios-http';
 import { STORAGE_KEYS } from '../../../../common/services/storage';
-import GradeChart from '../grade-chart/grade-chart';
+import GradeGroupChart from '../grade-group-chart/grade-group-chart';
+import { sortByParent, appendChildrenToParent } from '../../../../common/services/arrays';
 
 class ProfileCard extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            personData: { department: {}, grade: {} },
+            personData: { department: {}, qualification: [], specialization: {} },
             grades: []
         };
 
         this.setPersonData = this.setPersonData.bind(this);
         this.setGrades = this.setGrades.bind(this);
+        this.setObtainedItems = this.setObtainedItems.bind(this);
     }
 
     setPersonData(value) {
@@ -22,18 +24,45 @@ class ProfileCard extends React.Component {
     }
 
     setGrades(value) {
-        this.setState([...value]);
+        this.setState({ grades: value });
+    }
+
+    setObtainedItems(grades) {
+        let obtainedIndex = -1;
+        return grades
+            .reverse()
+            .map((grade, idx) => {
+                grade.description = '';
+                const qualGrades = this.state.personData.qualification.filter(q => q.grade.id === grade.id);
+
+                if (qualGrades.length > 0) {
+                    if (obtainedIndex === -1) {
+                        obtainedIndex = idx;
+                    }
+
+                    grade.obtainedDate = qualGrades[0].qualifiedDate;
+                }
+                if ((obtainedIndex !== -1 && obtainedIndex < idx) || qualGrades.length > 0) {
+                    grade.isObtained = true;
+                    return grade;
+                }
+                return grade;
+            })
+            .reverse();
     }
 
     componentDidMount() {
         http.get(`${http.getApiUri()}/users/${localStorage.getItem(STORAGE_KEYS.CURRENT_USER)}`)
-            .then(response => {
-                this.setPersonData({ ...response });
+            .then(personData => {
+                this.setPersonData(personData);
+                return personData.specializationId;
             })
-            .then(() => {
-                http.get(`${http.getApiUri()}/specializations/1/grades`).then(response => {
-                    this.setGrades(response);
-                });
+            .then(specId => {
+                http.get(`${http.getApiUri()}/specializations/${specId}/grades`)
+                    .then(sortByParent)
+                    .then(this.setObtainedItems)
+                    .then(appendChildrenToParent)
+                    .then(this.setGrades);
             });
     }
 
@@ -41,28 +70,18 @@ class ProfileCard extends React.Component {
         return (
             <div className="profile-card">
                 <div className="person-general">
-                    <div className="person-general__photo">photo</div>
-                    <div className="person-general__name">{this.state.personData.name}</div>
-                    <div className="person-general__department">{this.state.personData.department.name}</div>
+                    <div className="person-general__content-wrapper">
+                        <div className="person-general__photo">{this.state.personData.name}</div>
+                        <div className="person-general__name">{this.state.personData.specialization.name}</div>
+                        <div className="person-general__department">{this.state.personData.department.name}</div>
+                    </div>
                 </div>
                 <div className="grade-panel">
                     <div className="grade-panel__overview">
-                        <GradeChart
-                            specializationId="1"
-                            items={[
-                                { id: 1, name: 'D0', isObtained: true },
-                                { id: 2, name: 'D1' },
-                                { id: 3, name: 'D2' }
-                            ]}
+                        <GradeGroupChart
+                            specializationName={this.state.personData.specialization.name}
+                            items={this.state.grades}
                         />
-                    </div>
-
-                    <div className="grade-requirements">
-                        <ul>
-                            <li>req</li>
-                            <li>req</li>
-                            <li>req</li>
-                        </ul>
                     </div>
                 </div>
             </div>

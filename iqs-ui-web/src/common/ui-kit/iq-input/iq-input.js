@@ -6,6 +6,14 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 const ErrorItem = props => <li className="iq-input__error-item">{props.value}</li>;
 
+export const VALIDATION_TYPES = Object.freeze({
+    required: 'required',
+    length: 'length',
+    equal: 'equal',
+    range: 'range',
+    pattern: 'pattern'
+});
+
 ErrorItem.propTypes = {
     value: PropTypes.string
 };
@@ -65,26 +73,31 @@ export default class IqInput extends React.Component {
             const errorList = customValidationProps
                 .map(validationItem => {
                     switch (validationItem.type) {
-                        case 'required':
+                        case VALIDATION_TYPES.required:
                             if (val === '' || !val) {
                                 return 'This value is required';
                             }
                             break;
-                        case 'length':
+                        case VALIDATION_TYPES.length:
                             if (!val || val.length < +validationItem.value) {
                                 return `This value's length should be more than ${validationItem.value} chars`;
                             }
                             break;
-                        case 'equal':
+                        case VALIDATION_TYPES.equal:
                             if (val !== validationItem.value) {
                                 return `Values should be equal`;
                             }
                             break;
-                        case 'range':
+                        case VALIDATION_TYPES.range:
                             if (+val < +validationItem.valueFrom || +val > +validationItem.valueTo) {
                                 return `Values should be in range from ${validationItem.valueFrom} to ${
                                     validationItem.valueTo
                                 }`;
+                            }
+                            break;
+                        case VALIDATION_TYPES.pattern:
+                            if (!RegExp(validationItem.value).test(val)) {
+                                return 'This value should be valid (match pattern)';
                             }
                             break;
                         default:

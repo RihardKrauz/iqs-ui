@@ -1,17 +1,7 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
-import './grade-chart.scss';
+import './grade-group-chart.scss';
 import dayjs from 'dayjs';
-import { useOutsideClickEvent } from '../../../../common/services/hooks';
-
-const GradeItem = ({ isObtained, name }) => {
-    return <div className={`grade-panel__grade-item ${isObtained === true ? 'obtained' : ''}`}>{name}</div>;
-};
-
-GradeItem.propTypes = {
-    isObtained: PropTypes.bool,
-    name: PropTypes.string
-};
 
 const GradeItemDetails = ({ name, description, obtainedDate, isObtained }) => {
     const qualifiedDesc = isObtained === true ? <div>Passed</div> : <div>Not planned yet</div>;
@@ -42,36 +32,44 @@ GradeItemDetails.propTypes = {
     isObtained: PropTypes.bool
 };
 
-const GradeChart = ({ items }) => {
+const GradeGroupChart = ({ items, specializationName }) => {
     const [selectedGrade, setSelectedGrade] = React.useState(null);
-    const wrapperRef = useOutsideClickEvent(() => {
-        setSelectedGrade(null);
-    });
-    return (
-        <div className="grade-panel__content-wrapper" ref={wrapperRef}>
-            <div className="grade-panel__chart">
-                <div className="grade-panel__range">
-                    {items.map(item => (
-                        <div
-                            key={item.id}
-                            onClick={() => {
-                                setSelectedGrade(item);
-                            }}
-                            className={`grade-panel__item-wrapper ${selectedGrade === item ? 'active' : ''}`}
-                        >
-                            <GradeItem {...item} />
-                        </div>
-                    ))}
+
+    let levelPrefix = 'root-';
+
+    const groupTemplate = (groupItem, childrenContainerClass) => {
+        levelPrefix += 'sub-';
+        return groupItem.map((item, idx) => (
+            <div key={levelPrefix + idx} className="grade-group__wrapper">
+                <div
+                    className={`grade-group__title ${selectedGrade === item ? 'active' : ''} ${
+                        item.isObtained === true ? 'obtained' : ''
+                    }`}
+                    onClick={() => {
+                        setSelectedGrade(item);
+                    }}
+                >
+                    {item.name}
+                </div>
+                <div className={`grade-group__children ${childrenContainerClass}`}>
+                    {item.children.length > 0 &&
+                        groupTemplate(item.children, item.children.length > 1 ? 'multiple' : '')}
                 </div>
             </div>
-            <div className="grade-panel__popup">{selectedGrade && <GradeItemDetails {...selectedGrade} />}</div>
+        ));
+    };
+
+    return (
+        <div>
+            <div className="grade-group__layout">{groupTemplate(items, 'multiple')}</div>
+            <div className="grade-panel__popup">{selectedGrade && <GradeItemDetails {...selectedGrade} />}</div>{' '}
         </div>
     );
 };
 
-GradeChart.propTypes = {
+GradeGroupChart.propTypes = {
     items: PropTypes.array,
-    specializationId: PropTypes.string
+    specializationName: PropTypes.string
 };
 
-export default GradeChart;
+export default GradeGroupChart;

@@ -1,6 +1,6 @@
 import React from 'react';
 import IqTitle from '../../../../common/ui-kit/iq-icon-title/iq-icon-title';
-import IqInput from '../../../../common/ui-kit/iq-input/iq-input';
+import IqInput, { VALIDATION_TYPES } from '../../../../common/ui-kit/iq-input/iq-input';
 import IqLoader from '../../../../common/ui-kit/iq-loader/iq-loader';
 import IqSelect from '../../../../common/ui-kit/iq-select/iq-select';
 import './registration-card.scss';
@@ -58,15 +58,24 @@ const RegistrationCard = ({ isBusy, errorMessages, history, dispatch }) => {
     }, []);
 
     const fields = {
-        Login: new ValidatedField('Login', '', [{ type: 'required' }]),
-        Name: new ValidatedField('Name', '', [{ type: 'required' }, { type: 'length', value: 5 }]),
-        Age: new ValidatedField('Age', 0, [{ type: 'required' }, { type: 'range', valueFrom: 0, valueTo: 99 }]),
-        Password1: new ValidatedField('Password1', '', [{ type: 'required' }]),
-        Password2: new ValidatedField('Password2', '', [{ type: 'required' }])
+        Login: new ValidatedField('Login', '', [
+            { type: VALIDATION_TYPES.required },
+            { type: VALIDATION_TYPES.pattern, value: /^\S+$/ }
+        ]),
+        Name: new ValidatedField('Name', '', [
+            { type: VALIDATION_TYPES.required },
+            { type: VALIDATION_TYPES.length, value: 5 }
+        ]),
+        Age: new ValidatedField('Age', 0, [
+            { type: VALIDATION_TYPES.required },
+            { type: VALIDATION_TYPES.range, valueFrom: 0, valueTo: 99 }
+        ]),
+        Password1: new ValidatedField('Password1', '', [{ type: VALIDATION_TYPES.required }]),
+        Password2: new ValidatedField('Password2', '', [{ type: VALIDATION_TYPES.required }])
     };
 
-    fields['Password1'].addValidationParam('equal', fields['Password2'].value);
-    fields['Password2'].addValidationParam('equal', fields['Password1'].value);
+    fields['Password1'].addValidationParam(VALIDATION_TYPES.equal, fields['Password2'].value);
+    fields['Password2'].addValidationParam(VALIDATION_TYPES.equal, fields['Password1'].value);
 
     const validateFormAndGetAllErrors = f =>
         Object.keys(f).map(fieldName => {

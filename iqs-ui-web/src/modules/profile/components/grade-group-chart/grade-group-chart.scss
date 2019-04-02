@@ -1,0 +1,21 @@
+.grade-group__wrapper {
+    margin-left: 1em;
+    margin-bottom: 4px;
+}
+
+.grade-group__title {
+    text-align: start;
+    border-left: solid 1px transparent;
+}
+
+.grade-group__title:not(.obtained):not(.active) {
+    color: #999;
+}
+
+.grade-group__children.multiple {
+    border-left: solid 1px #cecece;
+}
+
+.grade-group__title.active {
+    font-weight: bold;
+}
